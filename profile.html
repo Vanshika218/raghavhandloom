@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile - Raghav Handloom</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fdfaf6;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .profile-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .profile-card h2 {
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    .profile-info {
+      margin: 1rem 0;
+      text-align: left;
+    }
+
+    .profile-info p {
+      margin: 0.5rem 0;
+      font-size: 1rem;
+    }
+
+    .action-buttons {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .action-buttons a {
+      text-decoration: none;
+      padding: 10px;
+      background-color: #b97b56;
+      color: white;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .action-buttons a:hover {
+      background-color: #a76944;
+    }
+  </style>
+</head>
+<body>
+
+<div class="profile-card">
+  <h2>Your Profile</h2>
+  <div class="profile-info" id="profileData">
+    <!-- Filled via JS -->
+  </div>
+
+  <div class="action-buttons">
+    <a href="orders.html">🧾 Your Orders</a>
+    <a href="#" onclick="logout()">🔓 Logout</a>
+  </div>
+</div>
+
+<script>
+  const user = JSON.parse(localStorage.getItem('user'));
+  const profileDiv = document.getElementById('profileData');
+
+  if (user) {
+    profileDiv.innerHTML = `
+      <p><strong>Name:</strong> ${user.name}</p>
+      <p><strong>Email:</strong> ${user.email}</p>
+      <p><strong>Phone:</strong> ${user.phone}</p>
+    `;
+  } else {
+    profileDiv.innerHTML = "<p>No user information found. Please sign up.</p>";
+  }
+
+  function logout() {
+    localStorage.removeItem('user');
+    window.location.href = 'index.html'; // or your login/home page
+  }
+</script>
+
+</body>
+</html>

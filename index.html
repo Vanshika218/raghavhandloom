@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Raghav Handloom - Home</title>
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f9f6f1, #e0dcd6);
+    }
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+    .logo {
+      height: 50px;
+      margin-left: 10px;
+    }
+    .shop-name {
+      color: #ffcc00;
+      font-size: 1.5rem;
+      font-family: 'Cursive', sans-serif;
+      margin-left: 10px;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      gap: 20px;
+    }
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .hamburger {
+  font-size: 20px;
+  cursor: pointer;
+  color: white;
+  margin-top: 0.5rem;
+  margin-left: 10px;
+  background-color: #444;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+.hamburger:hover {
+  background-color: #555;
+}
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 20px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 10;
+      min-width: 200px;
+      animation: slideDown 0.3s ease;
+    }
+    .dropdown-menu a {
+      display: block;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: #333;
+    }
+    .dropdown-menu a:hover {
+      background-color: #f0f0f0;
+    }
+.hero-banner {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.hero-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Keeps the image nicely cropped */
+  display: block;
+}
+
+.hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+  padding: 1rem;
+}
+
+
+    .banner {
+      text-align: center;
+      background: url('assets/shop-banner.jpg') no-repeat center center;
+      background-size: cover;
+      height: 300px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      font-size: 2.5rem;
+      font-weight: bold;
+      font-family: 'Cursive', sans-serif;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+      margin-bottom: 1.5rem;
+    }
+    .about {
+      padding: 2rem;
+      background-color: #fff;
+      text-align: center;
+    }
+    .shop-address {
+      font-weight: bold;
+      margin: 1rem 0;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #333;
+      color: #fff;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav ul {
+        display: none;
+      }
+      .hamburger {
+        display: block;
+      }
+    }
+   @keyframes slideDown {
+   from { opacity: 0; transform: translateY(-10px); }
+   to { opacity: 1; transform: translateY(0); }
+   }
+  </style>
+</head>
+<body>
+<header>
+  <div style="display: flex; flex-direction: column; align-items: flex-start;">
+    <h1 style="display: flex; align-items: center;">
+      <img src="C:\Users\VANSHIKA\OneDrive\Pictures\Screenshots\Screenshot 2025-06-04 175835.png" class="logo-img logo" />
+      <span class="shop-name">Raghav Handloom</span>
+    </h1>
+
+    <!-- Hamburger Icon (Left under logo) -->
+    <div class="hamburger" onclick="toggleDropdown()">☰ Explore Products</div>
+  </div>
+
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="cart.html" style="color: #fff; text-decoration: none; margin-left: 1rem;">Cart</a></li>
+      <li><a href="signup.html" style="color: #fff; text-decoration: none; margin-right: 15px;">Sign Up</a></li>
+       <li><a href="profile.html" style="color: #fff; text-decoration: none;">Profile</a></li>
+      <li><a href="admin.html">Admin</a></li>
+    </ul>
+  </nav>
+
+  <!-- Product Dropdown Menu (Left aligned) -->
+  <div class="dropdown-menu" id="dropdownMenu">
+    <a href="bedsheets.html">Bedsheets</a>
+    <a href="sofa-covers.html">Sofa Covers</a>
+    <a href="pillows.html">Pillows</a>
+    <a href="handkerchiefs.html">Handkerchiefs</a>
+    <a href="bed-side-runner.html">Bed Side Runner</a>
+    <a href="doormats.html">Doormats</a>
+    <a href="bedcovers.html">Bedcovers</a>
+    <a href="bathrobes.html">Bathrobes</a>
+    <a href="quilts.html">Quilts</a>
+    <a href="comforters.html">Comforters</a>
+  </div>
+</header>
+<div class="hero-banner">
+<img src="C:\Users\VANSHIKA\OneDrive\Pictures\Screenshots\Screenshot 2025-06-04 203758.png" alt="Shop Banner"/>
+<div class="hero-text">Raghav Handloom - Quality Home Textiles</div>
+</div>
+  <section class="about">
+    <h2>About <span class="shop-name">Raghav Handloom</span></h2>
+    <p>We specialize in premium home textile products and take pride in offering both quality and affordability.</p>
+    <p class="shop-address">Shop No. 5, Sikar House, Kapda Market</p>
+    </section>
+
+  <footer>
+    <p>&copy; 2025 <span class="shop-name">Raghav Handloom</span>. All rights reserved.</p>
+  </footer>
+<script>
+  function toggleDropdown() {
+    const menu = document.getElementById("dropdownMenu");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+  }
+window.addEventListener('click', function(e) {
+    const menu = document.getElementById('dropdownMenu');
+    const button = document.querySelector('.hamburger');
+    if (!menu.contains(e.target) && !button.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
+document.querySelectorAll('nav ul li a').forEach(link => {
+    if(link.getAttribute('href') === window.location.pathname.split('/').pop()){
+      link.addEventListener('click', e => {
+        e.preventDefault();
+      });
+    }
+  });
+</script>
+</body>
+</html>
