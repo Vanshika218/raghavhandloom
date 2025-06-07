@@ -11,6 +11,14 @@
       margin: 0;
       padding: 0;
     }
+    .review-input {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
     header {
       background-color: #333;
       color: #fff;
@@ -48,9 +56,9 @@
     }
     .product-card img {
       width: 50%;
-     max-height: 400px;
-     object-fit: cover; 
-     border-radius: 4px;
+      max-height: 400px;
+      object-fit: cover;
+      border-radius: 4px;
     }
     .product-name {
       font-weight: bold;
@@ -94,6 +102,35 @@
       color: #fff;
       margin-top: 2rem;
     }
+    .slider {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      margin: auto;
+    }
+    .slide {
+      display: none;
+      width: 100%;
+      border-radius: 4px;
+      transition: opacity 0.3s ease;
+    }
+    .slide.active {
+      display: block;
+    }
+    .prev, .next {
+      position: absolute;
+      top: 45%;
+      background-color: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 18px;
+      border-radius: 4px;
+      user-select: none;
+    }
+    .prev { left: 5px; }
+    .next { right: 5px; }
   </style>
 </head>
 <body>
@@ -105,12 +142,19 @@
 
 <main>
   <h2>Bedsheets Collection</h2>
-
   <div class="catalog-grid">
+
+    <!-- Product 1 -->
     <div class="product-card">
-      <img src="img/p.jpg" alt="Floral Bedsheet">
+      <div class="slider">
+        <img class="slide active" src="raghavhandloom/img/p.jpg" alt="Floral Bedsheet - 1">
+        <img class="slide" src="raghavhandloom/img/s.jpg" alt="Floral Bedsheet - 2">
+        <img class="slide" src="raghavhandloom/img/t.jpg" alt="Floral Bedsheet - 3">
+        <button class="prev" onclick="changeSlide(this, -1)">❮</button>
+        <button class="next" onclick="changeSlide(this, 1)">❯</button>
+      </div>
       <div class="product-name">Floral Print Cotton</div>
-      <div class="product-price">₹799</div>
+      <div class="product-price">₹3500</div>
       <button class="details-btn" onclick="toggleDetails(this)">Details</button>
       <div class="details-list">
         <ul>
@@ -120,13 +164,31 @@
           <li>Made in India</li>
         </ul>
       </div>
-     <button class="cart-btn" onclick="addToCart(this,'img/p.jpg','Floral Print Cotton', 799)">Add to Cart</button>
+
+      <!-- Quantity Selector -->
+      <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin: 10px 0;">
+        <label for="quantity" style="margin: 0;">Quantity:</label>
+        <input type="number" class="quantity-input" value="1" min="1" style="width: 60px;">
+      </div>
+
+      <button class="cart-btn" onclick="addToCart(this,'raghavhandloom/img/p.jpg','Floral Print Cotton', 3500)">Add to Cart</button>
+      <button class="details-btn" onclick="toggleProductReviews(this)">All Reviews</button>
+      <div class="product-reviews" style="display: none;"></div>
+      <textarea class="review-input" rows="2" placeholder="Write a review..."></textarea>
+      <button class="cart-btn" onclick="submitProductReview(this)">Submit Review</button>
     </div>
 
+    <!-- Product 2 -->
     <div class="product-card">
-      <img src="img/q.jpg" alt="Geometric Bedsheet">
+      <div class="slider">
+        <img class="slide active" src="raghavhandloom/img/q.jpg" alt="Geometric Bedsheet - 1">
+        <img class="slide" src="raghavhandloom/img/r.jpg" alt="Geometric Bedsheet - 2">
+        <img class="slide" src="raghavhandloom/img/u.jpg" alt="Geometric Bedsheet - 3">
+        <button class="prev" onclick="changeSlide(this, -1)">❮</button>
+        <button class="next" onclick="changeSlide(this, 1)">❯</button>
+      </div>
       <div class="product-name">Geometric Luxury</div>
-      <div class="product-price">₹999</div>
+      <div class="product-price">₹3499</div>
       <button class="details-btn" onclick="toggleDetails(this)">Details</button>
       <div class="details-list">
         <ul>
@@ -136,11 +198,19 @@
           <li>Imported quality</li>
         </ul>
       </div>
-      <button class="cart-btn" onclick="addToCart(this,'img/q.jpg','Geometric Luxury', 999)">Add to Cart</button>
 
+      <!-- Quantity Selector -->
+      <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin: 10px 0;">
+        <label for="quantity" style="margin: 0;">Quantity:</label>
+        <input type="number" class="quantity-input" value="1" min="1" style="width: 60px;">
+      </div>
+
+      <button class="cart-btn" onclick="addToCart(this,'raghavhandloom/img/q.jpg','Geometric Luxury', 3499)">Add to Cart</button>
+      <button class="details-btn" onclick="toggleProductReviews(this)">All Reviews</button>
+      <div class="product-reviews" style="display: none;"></div>
+      <textarea class="review-input" rows="2" placeholder="Write a review..."></textarea>
+      <button class="cart-btn" onclick="submitProductReview(this)">Submit Review</button>
     </div>
-
-    <!-- Repeat similar blocks for 3 more products -->
 
   </div>
 </main>
@@ -148,32 +218,124 @@
 <footer>
   &copy; 2025 Raghav Handloom. All rights reserved.
 </footer>
+
+<section>
+  <h3>🗣 Customer Reviews</h3>
+  <ul id="siteReviews"></ul>
+</section>
+
 <script>
+  function showSiteReviews() {
+    const reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+    const container = document.getElementById("siteReviews");
+    container.innerHTML = "";
+    reviews.forEach((r) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${r.user}:</strong> ${r.review}`;
+      container.appendChild(li);
+    });
+  }
+  showSiteReviews();
+
   function toggleDetails(btn) {
     const details = btn.nextElementSibling;
     details.style.display = details.style.display === "block" ? "none" : "block";
   }
 
-  function addToCart(button,image, name, price) {
+  function submitProductReview(button) {
+    const productCard = button.closest('.product-card');
+    const reviewBox = productCard.querySelector('.review-input');
+    const productName = productCard.querySelector('.product-name').innerText;
+    const reviewText = reviewBox.value.trim();
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+      alert("Please login to submit a review.");
+      return;
+    }
+
+    if (reviewText === "") {
+      alert("Please write something!");
+      return;
+    }
+
+    const allReviews = JSON.parse(localStorage.getItem("productReviews")) || {};
+    if (!allReviews[productName]) allReviews[productName] = [];
+
+    allReviews[productName].push({
+      user: user.name,
+      review: reviewText
+    });
+
+    localStorage.setItem("productReviews", JSON.stringify(allReviews));
+    reviewBox.value = "";
+
+    const reviewDiv = productCard.querySelector('.product-reviews');
+    if (reviewDiv.style.display === "block") {
+      toggleProductReviews(productCard.querySelector("button.details-btn"));
+      toggleProductReviews(productCard.querySelector("button.details-btn"));
+    }
+
+    alert("Thanks for your review!");
+  }
+
+  function addToCart(button, fallbackImage, name, price) {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const productCard = button.closest('.product-card');
+    const activeSlide = productCard.querySelector('.slide.active');
+    const selectedImage = activeSlide ? activeSlide.src : fallbackImage;
+    const quantity = parseInt(productCard.querySelector('.quantity-input').value) || 1;
+
     const exists = cart.find(item => item.name === name);
     if (!exists) {
-      cart.push({ name, price });
+      cart.push({ image: selectedImage, name, price, quantity });
       localStorage.setItem('cart', JSON.stringify(cart));
-      alert(`${name} added to cart!`);
+      alert(`${name} (x${quantity}) added to cart!`);
     } else {
       alert(`${name} is already in the cart.`);
     }
 
-    // Button styling
     if (button) {
       button.textContent = '✔ Added';
       button.disabled = true;
-      button.style.backgroundColor = '#28a745'; // green
+      button.style.backgroundColor = '#28a745';
       button.style.color = 'white';
     }
   }
+
+  function toggleProductReviews(button) {
+    const reviewDiv = button.nextElementSibling;
+    const productCard = button.closest('.product-card');
+    const productName = productCard.querySelector('.product-name').innerText;
+
+    const allReviews = JSON.parse(localStorage.getItem("productReviews")) || {};
+    const productReviews = allReviews[productName] || [];
+
+    if (reviewDiv.style.display === "none") {
+      reviewDiv.style.display = "block";
+
+      if (productReviews.length === 0) {
+        reviewDiv.innerHTML = "<p>No reviews yet for this product.</p>";
+      } else {
+        reviewDiv.innerHTML = `
+          <ul>
+            ${productReviews.map(r => `<li><strong>${r.user}:</strong> ${r.review}</li>`).join("")}
+          </ul>`;
+      }
+    } else {
+      reviewDiv.style.display = "none";
+    }
+  }
+
+  function changeSlide(btn, direction) {
+    const slider = btn.closest(".slider");
+    const slides = slider.querySelectorAll(".slide");
+    let currentIndex = Array.from(slides).findIndex(s => s.classList.contains("active"));
+    slides.forEach(slide => slide.classList.remove("active"));
+    let newIndex = (currentIndex + direction + slides.length) % slides.length;
+    slides[newIndex].classList.add("active");
+  }
 </script>
 
- </body>
+</body>
 </html>
