@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
- <title>My Cart - Raghav Handloom</title>
+  <title>My Cart - Raghav Handloom</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-     background-color: #fdfaf6;
+      background-color: #fdfaf6;
       margin: 0;
       padding: 0;
     }
@@ -69,21 +69,25 @@
       margin-top: 2rem;
     }
   </style>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 <header>
   <div class="shop-name">Raghav Handloom</div>
   <nav>
     <a href="index.html" style="color: #fff; text-decoration: none; margin-right: 15px;">Home</a>
-    </header>
+  </nav>
+</header>
+
 <main>
   <h2>Shopping Cart</h2>
   <table id="cartTable">
     <thead>
       <tr>
         <th>Product</th>
-        <th>Price (₹)</th>
+        <th>Unit Price (₹)</th>
+        <th>Quantity</th>
+        <th>Total (₹)</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -93,8 +97,7 @@
   </table>
   <div class="total" id="cartTotal">Total: ₹0</div>
   <button class="clear-btn" onclick="clearCart()">Clear Cart</button>
-<button class="clear-btn" style="background-color:green;" onclick="pay()">Proceed to Pay</button>
-
+  <button class="clear-btn" style="background-color:green;" onclick="goToPayment()">Proceed to Pay</button>
 </main>
 
 <footer>
@@ -109,21 +112,26 @@
     tableBody.innerHTML = '';
 
     let total = 0;
+
     cart.forEach((item, index) => {
-  const row = document.createElement('tr');
-row.innerHTML = `
-  <td>
-    <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"><br>
-    ${item.name}
-  </td>
-  <td>₹${item.price}</td>
-  <td><button onclick="removeItem(${index})" style="background-color:red; color:white; border:none; padding:5px 10px; border-radius:4px;">Delete</button></td>
-`;
+      const itemTotal = item.price * (item.quantity || 1);
+      total += itemTotal;
 
-  tableBody.appendChild(row);
-  total += item.price;
-});
-
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>
+          <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"><br>
+          ${item.name}
+        </td>
+        <td>₹${item.price}</td>
+        <td>${item.quantity || 1}</td>
+        <td>₹${itemTotal}</td>
+        <td>
+          <button onclick="removeItem(${index})" style="background-color:red; color:white; border:none; padding:5px 10px; border-radius:4px;">Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
 
     totalDiv.textContent = `Total: ₹${total}`;
   }
@@ -132,48 +140,27 @@ row.innerHTML = `
     localStorage.removeItem('cart');
     loadCart();
   }
-function removeItem(index) {
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  cart.splice(index, 1);
-  localStorage.setItem('cart', JSON.stringify(cart));
-  loadCart();
-}
-function pay() {
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  if (cart.length === 0) {
-    alert("Your cart is empty!");
-    return;
+
+  function removeItem(index) {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart.splice(index, 1);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    loadCart();
   }
 
-  let total = cart.reduce((sum, item) => sum + item.price, 0);
-
-  const options = {
-    key: "rzp_test_YourTestKeyHere", // 🔴 Replace with your Razorpay test key
-    amount: total * 100, // Razorpay needs amount in paisa
-    currency: "INR",
-    name: "Raghav Handloom",
-    description: "Purchase from Raghav Handloom",
-    image: "", // You can add your logo URL here
-    handler: function (response) {
-      alert("✅ Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
-      localStorage.removeItem('cart');
-      loadCart();
-    },
-    prefill: {
-      name: "Your Name",
-      email: "email@example.com",
-      contact: "9999999999"
-    },
-    theme: {
-      color: "#333"
+  function goToPayment() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if (cart.length === 0) {
+      alert("Your cart is empty!");
+      return;
     }
-  };
 
-  const rzp = new Razorpay(options);
-  rzp.open();
-}
+    let total = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+    localStorage.setItem("cartTotal", total);
+    window.location.href = "payment.html";
+  }
+
   window.onload = loadCart;
 </script>
-
 </body>
 </html>
