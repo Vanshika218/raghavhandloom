@@ -3,72 +3,237 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Payment - Raghav Handloom</title>
+  <title>Confirm Payment</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #fdfaf6;
-      padding: 2rem;
+    body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 2rem; }
+    .section {
+      background: white;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    h2 {
-      text-align: center;
-      color: #333;
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
     }
-    .payment-options {
-      max-width: 500px;
-      margin: 2rem auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .option {
-      margin: 1rem 0;
-    }
-    .option input {
-      margin-right: 10px;
+    input, select, textarea, button {
+      width: 100%;
+      margin-top: 0.5rem;
+      margin-bottom: 1.5rem;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 1rem;
     }
     button {
-      background-color: green;
+      background: #28a745;
       color: white;
-      padding: 10px 20px;
       border: none;
-      border-radius: 4px;
+      font-size: 1rem;
       cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+    h2 { margin-bottom: 1rem; }
+    #qr-section img {
+      max-width: 200px;
       margin-top: 1rem;
-      width: 100%;
+    }
+    .hidden { display: none; }
+    #success-message {
+      font-size: 1.2rem;
+      color: green;
+      margin-top: 1rem;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-<h2>Select Payment Method</h2>
-<div class="payment-options">
-  <div class="option">
-    <input type="radio" name="payment" id="razorpay" checked>
-    <label for="razorpay">Razorpay</label>
-  </div>
-  <div class="option">
-    <input type="radio" name="payment" id="gpay">
-    <label for="gpay">Google Pay</label>
-  </div>
-  <div class="option">
-    <input type="radio" name="payment" id="phonepe">
-    <label for="phonepe">PhonePe</label>
-  </div>
-  <div class="option">
-    <input type="radio" name="payment" id="cod">
-    <label for="cod">Cash on Delivery</label>
-  </div>
-  <button onclick="confirmPayment()">Confirm Payment</button>
-</div>
+  <h2>🧾 Review & Confirm Your Payment</h2>
 
-<script>
-  function confirmPayment() {
-    alert("Thank you! Your payment method has been selected.");
-    window.location.href = "index2.html"; // redirect to homepage
-  }
-</script>
+  <!-- 🛒 Cart Summary -->
+  <div class="section" id="cart-summary">
+    <h3>🛍️ Order Summary</h3>
+    <div id="cart-items"></div>
+    <p><strong>Total: ₹<span id="total-amount">0</span></strong></p>
+  </div>
+
+  <!-- 👤 Customer Info -->
+  <div class="section">
+    <h3>👤 Customer Details</h3>
+    <label for="name">Full Name</label>
+    <input type="text" id="name" placeholder="Full Name" required />
+    
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" placeholder="Phone Number" required />
+    
+    <label for="email">Email Address</label>
+    <input type="email" id="email" placeholder="Email Address" required />
+    
+    <label for="address">Shipping Address</label>
+    <textarea id="address" rows="3" placeholder="Shipping Address" required></textarea>
+  </div>
+
+  <!-- 💳 Payment Method -->
+  <div class="section">
+    <h3>💳 Payment Method</h3>
+    <label for="payment-method">Select Payment Method</label>
+    <select id="payment-method" required>
+      <option value="">-- Select Payment Method --</option>
+      <option value="UPI">UPI</option>
+      <option value="Paytm">Paytm</option>
+      <option value="PhonePe">PhonePe</option>
+      <option value="GooglePay">Google Pay</option>
+      <option value="Cash On Delivery">Cash On Delivery</option>
+    </select>
+    <div id="qr-section" class="hidden">
+      <p>📷 Scan the QR Code below and complete your payment:</p>
+      <img src="raghavhandloom/img/x.png" alt="QR Code for payment" />
+    </div>
+  </div>
+
+  <!-- 📷 Upload Screenshot -->
+  <div class="section" id="screenshot-section" style="display: none;">
+    <h3>📎 Upload Payment Screenshot</h3>
+    <label for="screenshot">Upload Screenshot</label>
+    <input type="file" id="screenshot" accept="image/*" />
+  </div>
+
+  <!-- ✅ Submit -->
+  <div class="section">
+    <button id="submit-btn" disabled>✅ Confirm Payment</button>
+    <div id="success-message">✅ Payment submitted! You’ll be notified once verified.</div>
+  </div>
+
+  <script>
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const cartContainer = document.getElementById("cart-items");
+    const totalAmountEl = document.getElementById("total-amount");
+    let total = 0;
+
+    if (cart.length === 0) {
+      alert("Cart is empty! Redirecting to cart page.");
+      window.location.href = "cart.html";
+    }
+
+    cart.forEach(item => {
+      const name = item.name || "Unnamed Product";
+      const price = Number(item.price) || 0;
+      const quantity = Number(item.quantity) || 1;
+      const subtotal = price * quantity;
+      total += subtotal;
+
+      const p = document.createElement("p");
+      p.textContent = `${name} x ${quantity} = ₹${subtotal.toFixed(2)}`;
+      cartContainer.appendChild(p);
+    });
+
+    totalAmountEl.textContent = total.toFixed(2);
+
+    const profile = JSON.parse(localStorage.getItem("userProfile") || "{}");
+    if (profile.name) document.getElementById("name").value = profile.name;
+    if (profile.phone) document.getElementById("phone").value = profile.phone;
+    if (profile.email) document.getElementById("email").value = profile.email;
+    if (profile.address) document.getElementById("address").value = profile.address;
+
+    const paymentSelect = document.getElementById("payment-method");
+    const qrSection = document.getElementById("qr-section");
+    const screenshotSection = document.getElementById("screenshot-section");
+    const qrImage = qrSection.querySelector("img");
+    const submitBtn = document.getElementById("submit-btn");
+    const screenshotInput = document.getElementById("screenshot");
+
+    function togglePaymentInputs() {
+      const val = paymentSelect.value;
+      if (val === "" || val === "Cash On Delivery") {
+        qrSection.classList.add("hidden");
+        screenshotSection.style.display = "none";
+      } else {
+        qrSection.classList.remove("hidden");
+        screenshotSection.style.display = "block";
+      }
+    }
+
+    function validateForm() {
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const method = paymentSelect.value;
+      const screenshot = screenshotInput.files[0];
+
+      if (!name || !phone || !email || !address || !method) return false;
+      if (method !== "Cash On Delivery" && !screenshot) return false;
+      return true;
+    }
+
+    function toggleSubmit() {
+      submitBtn.disabled = !validateForm();
+    }
+
+    ["name", "phone", "email", "address", "payment-method", "screenshot"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener("input", toggleSubmit);
+        el.addEventListener("change", toggleSubmit);
+      }
+    });
+
+    paymentSelect.addEventListener("change", () => {
+      togglePaymentInputs();
+      toggleSubmit();
+    });
+
+    togglePaymentInputs();
+    toggleSubmit();
+
+    submitBtn.addEventListener("click", async function () {
+      if (!validateForm()) {
+        alert("Please fill all required fields.");
+        return;
+      }
+
+      const orderData = {
+        name: document.getElementById("name").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        address: document.getElementById("address").value.trim(),
+        method: paymentSelect.value,
+        cart: cart,
+        total: total.toFixed(2),
+        screenshotUrl: "screenshot_upload_skipped_for_now"
+      };
+
+      try {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbzetkEDCHFobSA5gmsaYh-T8mONX1SsEjz89axQCHJBNRwN9MAh8xL1w32syae_wgeTAQ/exec", {
+          method: "POST",
+          body: JSON.stringify(orderData),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById("success-message").style.display = "block";
+          localStorage.removeItem("cart");
+          submitBtn.disabled = true;
+        } else {
+          alert("Something went wrong while submitting your order.");
+        }
+      } catch (error) {
+        alert("Error connecting to the server. Please try again.");
+        console.error(error);
+      }
+    });
+  </script>
 
 </body>
 </html>
