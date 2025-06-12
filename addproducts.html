@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add Product - Raghav Handloom</title>
+  <style>
+    body { font-family: Arial; background: #fdfaf6; padding: 2rem; }
+    h2 { color: #333; font-family: 'Cursive', sans-serif; }
+    form { display: flex; flex-direction: column; gap: 1rem; max-width: 400px; margin: auto; }
+    input, textarea, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    button { background-color: #28a745; color: white; padding: 8px; border: none; border-radius: 4px; cursor: pointer; }
+    .product-list { max-width: 600px; margin: 2rem auto; }
+    .product { background: #fff; padding: 1rem; border: 1px solid #ccc; margin-bottom: 1rem; border-radius: 4px; }
+    .delete-btn { background: red; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>Add New Product</h2>
+  <form onsubmit="event.preventDefault(); saveProduct();">
+    <input type="text" id="name" placeholder="Product Name" required>
+    <input type="number" id="price" placeholder="Price (INR)" required>
+    <textarea id="desc" placeholder="Description (comma-separated)" rows="3" required></textarea>
+    <textarea id="images" placeholder="Image URLs (comma-separated)" rows="3" required></textarea>
+    <select id="category" required>
+  <option value="">Select Category</option>
+  <option value="Bedsheets">Bedsheets</option>
+  <option value="Sofa Covers">Sofa Covers</option>
+  <option value="Handkerchiefs">Handkerchiefs</option>
+  <option value="Bedside Runner">Bedside Runner</option>
+  <option value="Doormats">Doormats</option>
+  <option value="Bedcovers">Bedcovers</option>
+  <option value="Bathrobes">Bathrobes</option>
+  <option value="Quilts">Quilts</option>
+  <option value="Pillows">Pillows</option>
+  <option value="Comforters">Comforters</option>
+</select>
+    <button type="submit">Save Product</button>
+  </form>
+
+  <div class="product-list" id="adminProducts"></div>
+
+  <script>
+    function saveProduct() {
+      const name = document.getElementById("name").value.trim();
+      const price = parseFloat(document.getElementById("price").value);
+      const desc = document.getElementById("desc").value.split(',').map(s => s.trim()).filter(s => s);
+      const images = document.getElementById("images").value.split(',').map(s => s.trim()).filter(s => s);
+      const category = document.getElementById("category").value;
+
+      const newProduct = { name, price, description: desc, images, category };
+
+      const stored = JSON.parse(localStorage.getItem("products")) || [];
+      stored.push(newProduct);
+      localStorage.setItem("products", JSON.stringify(stored));
+
+      alert("Product added successfully!");
+const pageCategoryMap = {
+    "bedsheets.html": "Bedsheets",
+    "doormats.html": "Doormats",
+    "comforters.html": "Comforters",
+    "bed-side-runner.html": "Bedside Runner",
+    "quilts.html": "Quilts",
+    "sofa-covers.html": "Sofa Covers",
+    "bedcovers.html": "Bedcovers",
+    "bathrobes.html": "Bathrobes",
+    "pillows.html": "Pillows",
+    "handkerchiefs.html": "Handkerchiefs"
+  };
+      const filename = Object.keys(pageCategoryMap).find(key => pageCategoryMap[key] === category);
+      window.location.href = filename || "index.html";
+    }
+
+    function renderAdminProducts() {
+      const products = JSON.parse(localStorage.getItem("products")) || [];
+      const container = document.getElementById("adminProducts");
+      container.innerHTML = "<h2>Manage Products</h2>";
+      products.forEach((prod, idx) => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <strong>${prod.name}</strong><br>
+          ₹${prod.price}<br>
+          <em>${prod.category}</em><br>
+          <button class="delete-btn" onclick="deleteProduct(${idx})">Delete</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function deleteProduct(index) {
+      const confirmDelete = confirm("Are you sure you want to delete this product?");
+      if (!confirmDelete) return;
+      const products = JSON.parse(localStorage.getItem("products")) || [];
+      products.splice(index, 1);
+      localStorage.setItem("products", JSON.stringify(products));
+      renderAdminProducts();
+    }
+
+    renderAdminProducts();
+  </script>
+</body>
+</html>
