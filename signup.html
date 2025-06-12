@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up - Raghav Handloom</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fdfaf6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-box {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 6px;
+      background-color: #333;
+      color: white;
+      cursor: pointer;
+    }
+    .signin-message {
+      margin-top: 1rem;
+      font-size: 14px;
+    }
+    .signin-message a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .signin-message a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-box">
+  <h2>Sign Up</h2>
+  <input type="text" id="name" placeholder="Full Name" required />
+  <input type="email" id="email" placeholder="Email" required />
+  <input type="text" id="phone" placeholder="Phone Number" required />
+  <input type="password" id="password" placeholder="Signup Key" required />
+  <textarea id="address" placeholder="Address" rows="3" required></textarea>
+  <input type="text" id="pincode" placeholder="PIN Code" required />
+  <button onclick="signUp()">Sign Up</button>
+
+  <div class="signin-message">
+    Already have an account? <a href="signin.html">Sign In</a>
+  </div>
+</div>
+
+<script>
+async function signUp() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const pincode = document.getElementById('pincode').value.trim();
+
+  if (!name || !email || !phone || !password || !address || !pincode) {
+    alert("Please fill all fields.");
+    return;
+  }
+
+  // CHECK for duplicate email using the Apps Script Web App
+  try {
+   const checkUrl = `https://script.google.com/macros/s/AKfycbzcXpTRd4Rlv5VQvsCNv85M_W6PvFFsteB-pDJlsJZbo93QLUjMw6RgQJzJdJEtrgel/exec?mode=checkEmail&email=${encodeURIComponent(email)}&signupKey=${encodeURIComponent(password)}`;
+    const response = await fetch(checkUrl);
+    const result = await response.json();
+
+ if (result.success && result.exists) {
+  alert("You are already signed up. Please sign in to access your account.");
+  window.location.href = "signin.html";
+  return;
+}
+    // If not a duplicate, proceed to submit the form
+    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScVsAjhME0MehK7j0B02jlb0yUoDYVOqEScrG6Ok7mPL2CNmw/formResponse";
+
+    const formData = new FormData();
+    formData.append("entry.1142797664", name);      // Full Name
+    formData.append("entry.1601309709", email);     // Email
+    formData.append("entry.2144471782", phone);     // Phone Number
+    formData.append("entry.732281413", password);   // Signup Key
+    formData.append("entry.68531594", address);     // Address
+    formData.append("entry.304893920", pincode);    // PIN Code
+
+    fetch(formUrl, {
+      method: "POST",
+      mode: "no-cors",
+      body: formData
+    })
+    .then(() => {
+      alert("Signup successful!");
+      localStorage.setItem("currentUser", email);
+      localStorage.setItem("currentPass", password);
+      window.location.href = "profile.html";
+    })
+    .catch(() => {
+      alert("Something went wrong. Please try again.");
+    });
+
+  } catch (err) {
+    console.error("Error checking for duplicate email:", err);
+    alert("There was a problem verifying your account. Please try again.");
+  }
+}
+</script>
+
+</body>
+</html>
