@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confirm Payment</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 2rem; }
+    .section {
+      background: white;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      margin-top: 0.5rem;
+      margin-bottom: 1.5rem;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+    h2 { margin-bottom: 1rem; }
+    .hidden { display: none; }
+    .address-pincode-container {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .address-pincode-container textarea {
+      flex: 2;
+      resize: vertical;
+    }
+    .address-pincode-container .pincode-wrapper {
+      flex: 1;
+    }
+    #qr-code-section img {
+      max-width: 300px;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🗳️ Review & Confirm Your Payment</h2>
+
+  <div class="section" id="cart-summary">
+    <h3>🛍 Order Summary</h3>
+    <div id="cart-items"></div>
+    <p><strong>Subtotal: ₹<span id="subtotal-amount">0</span></strong></p>
+    <p><strong>Delivery Charge: ₹<span id="delivery-charge">0</span></strong></p>
+    <p><strong>Total (incl. Delivery): ₹<span id="total-amount">0</span></strong></p>
+  </div>
+
+  <div class="section">
+    <h3>👤 Customer Details</h3>
+    <label for="name">Full Name</label>
+    <input type="text" id="name" required />
+    
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" required />
+    
+    <label for="email">Email Address</label>
+    <input type="email" id="email" required />
+    
+    <label for="address">Delivery Address</label>
+    <div class="address-pincode-container">
+      <textarea id="address" required rows="3" placeholder="Street, Area, etc."></textarea>
+      <div class="pincode-wrapper">
+        <label for="pincode">PIN Code</label>
+        <input type="text" id="pincode" required placeholder="e.g., 560001" maxlength="6" />
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <label for="payment-method">Payment Method</label>
+    <select id="payment-method" required>
+      <option value="" disabled selected>Select Payment Method</option>
+      <option value="UPI (Paytm / Google Pay / Phone Pay)">UPI (Paytm / Google Pay / Phone Pay)</option>
+      <option value="Cash on Delivery">Cash on Delivery</option>
+    </select>
+  </div>
+
+  <div class="section hidden" id="qr-code-section">
+    <h3>📲 Scan to Pay</h3>
+    <img id="qr-code-img" src="img/a1.jpg" alt="UPI QR Code" />
+  </div>
+
+  <div class="section hidden" id="google-form-section">
+    <button type="button" id="google-form-btn" onclick="openPrefilledGoogleForm()">📝 Fill Google Form with Your Info</button>
+  </div>
+
+  <div class="section">
+    <button id="submit-btn" disabled>✅ Confirm Payment</button>
+  </div>
+
+  <script>
+    try {
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const cartContainer = document.getElementById("cart-items");
+      const subtotalAmountEl = document.getElementById("subtotal-amount");
+      const deliveryChargeEl = document.getElementById("delivery-charge");
+      const totalAmountEl = document.getElementById("total-amount");
+      const paymentMethodSelect = document.getElementById("payment-method");
+      const submitBtn = document.getElementById("submit-btn");
+      const qrCodeSection = document.getElementById("qr-code-section");
+      const googleFormSection = document.getElementById("google-form-section");
+
+      let total = 0;
+      let googleFormFilled = false;
+
+      if (cart.length === 0) {
+        alert("Cart is empty! Redirecting to cart page.");
+        window.location.href = "cart.html";
+      }
+
+      cart.forEach(item => {
+        const name = item.name || "Unnamed Product";
+        const price = Number(item.price) || 0;
+        const quantity = Number(item.quantity) || 1;
+        const subtotal = price * quantity;
+        total += subtotal;
+        const p = document.createElement("p");
+        p.textContent = `${name} x ${quantity} = ₹${subtotal.toFixed(2)}`;
+        cartContainer.appendChild(p);
+      });
+
+      function calculateDeliveryCharge() {
+        return cart.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) * 30;
+      }
+
+      function updateAmounts() {
+        const deliveryCharge = calculateDeliveryCharge();
+        subtotalAmountEl.textContent = total.toFixed(2);
+        deliveryChargeEl.textContent = deliveryCharge.toFixed(2);
+        totalAmountEl.textContent = (total + deliveryCharge).toFixed(2);
+        return deliveryCharge;
+      }
+
+      let deliveryCharge = updateAmounts();
+
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (user.name) document.getElementById("name").value = user.name;
+      if (user.phone) document.getElementById("phone").value = user.phone;
+      if (user.email) document.getElementById("email").value = user.email;
+      if (user.address) document.getElementById("address").value = user.address;
+      if (user.pincode) document.getElementById("pincode").value = user.pincode;
+
+      function validateForm() {
+        const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const address = document.getElementById("address").value.trim();
+        const pincode = document.getElementById("pincode").value.trim();
+        const paymentMethod = paymentMethodSelect.value;
+
+        if (!name || !phone || !email || !address || !pincode || !paymentMethod) return false;
+        if (!/^\d{6}$/.test(pincode)) return false;
+        if (!/^[6-9]\d{9}$/.test(phone)) return false;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
+        if (paymentMethod === "UPI (Paytm / Google Pay / Phone Pay)" && !googleFormFilled) return false;
+        return true;
+      }
+
+      function updateUIOnPaymentMethodChange() {
+        const paymentMethod = paymentMethodSelect.value;
+        if (paymentMethod === "Cash on Delivery") {
+          googleFormSection.classList.add("hidden");
+          qrCodeSection.classList.add("hidden");
+          googleFormFilled = true;
+        } else if (paymentMethod === "UPI (Paytm / Google Pay / Phone Pay)") {
+          googleFormSection.classList.remove("hidden");
+          qrCodeSection.classList.remove("hidden");
+          googleFormFilled = false;
+        } else {
+          googleFormSection.classList.add("hidden");
+          qrCodeSection.classList.add("hidden");
+          googleFormFilled = false;
+        }
+        submitBtn.disabled = !validateForm();
+      }
+
+      paymentMethodSelect.addEventListener("change", updateUIOnPaymentMethodChange);
+
+      ["name", "phone", "email", "address", "pincode"].forEach(id => {
+        document.getElementById(id).addEventListener("input", () => {
+          if (id === "pincode") deliveryCharge = updateAmounts();
+          submitBtn.disabled = !validateForm();
+        });
+      });
+
+      function openPrefilledGoogleForm() {
+        const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const address = document.getElementById("address").value.trim();
+        const pincode = document.getElementById("pincode").value.trim();
+        const paymentMethod = paymentMethodSelect.value;
+
+        let cartDetails = "";
+        cart.forEach(item => {
+          const product = item.name || "Unnamed";
+          const quantity = item.quantity || 1;
+          const price = item.price || 0;
+          const imageUrl = item.image || "";
+          const imageLink = imageUrl ? ` [Image](${imageUrl})` : "";
+          cartDetails += `${product} x${quantity} = ₹${(price * quantity).toFixed(2)}${imageLink}\n`;
+        });
+
+        const totalFormatted = total.toFixed(2);
+        const baseURL = "https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url";
+        const fullURL = `${baseURL}&entry.552548492=${encodeURIComponent(name)}&entry.257981681=${encodeURIComponent(phone)}&entry.1920841676=${encodeURIComponent(email)}&entry.340525268=${encodeURIComponent(address)}&entry.1264909969=${encodeURIComponent(pincode)}&entry.216020480=${encodeURIComponent(cartDetails)}&entry.1584322114=${encodeURIComponent(totalFormatted)}&entry.1131349200=${encodeURIComponent(paymentMethod)}`;
+
+        window.open(fullURL, "_blank");
+        googleFormFilled = true;
+        submitBtn.disabled = !validateForm();
+      }
+
+      submitBtn.addEventListener("click", () => {
+        if (!validateForm()) {
+          alert("Please complete the form and include valid details.");
+          return;
+        }
+
+        const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const address = document.getElementById("address").value.trim();
+        const pincode = document.getElementById("pincode").value.trim();
+        const paymentMethod = paymentMethodSelect.value;
+
+        const order = {
+          date: new Date().toISOString(),
+          items: cart,
+          subtotal: total.toFixed(2),
+          deliveryCharge: deliveryCharge.toFixed(2),
+          total: (total + deliveryCharge).toFixed(2),
+          customer: { name, phone, email, address, pincode },
+          paymentMethod
+        };
+
+        const allOrders = JSON.parse(localStorage.getItem("userOrders") || "{}");
+        const userOrders = allOrders[email] || [];
+        userOrders.push(order);
+        allOrders[email] = userOrders;
+        localStorage.setItem("userOrders", JSON.stringify(allOrders));
+        localStorage.removeItem("cart");
+
+        if (paymentMethod === "Cash on Delivery") {
+          const codFormURL = `https://docs.google.com/forms/d/e/1FAIpQLScB9r5MtB3HBNKa6kzOCZWz2sf4X0ZN1Gik0HefGCyQvgvSvw/viewform?usp=pp_url&entry.727221695=${encodeURIComponent(name)}&entry.587011233=${encodeURIComponent(phone)}&entry.671837471=${encodeURIComponent(email)}&entry.1798396967=${encodeURIComponent(address)}&entry.916509460=${encodeURIComponent(pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(paymentMethod)}`;
+          window.open(codFormURL, "_blank");
+        }
+
+        document.body.innerHTML = `<div style="font-family: Arial, sans-serif; text-align: center; padding: 100px 20px;"><h1 style="color: green; font-size: 2.5rem;">✅ Your order is confirmed!</h1><p style="font-size: 1.2rem;">Thank you for shopping with us. Redirecting to home...</p></div>`;
+        setTimeout(() => window.location.href = "index.html", 4000);
+      });
+
+      updateUIOnPaymentMethodChange();
+
+    } catch (error) {
+      console.error("Error in payment page script:", error);
+      alert("Something went wrong loading payment details. Please refresh and try again.");
+    }
+  </script>
+</body>
+</html>
