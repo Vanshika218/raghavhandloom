@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign In - Raghav Handloom</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fdfaf6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-box {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 6px;
+      background-color: #333;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-box">
+  <h2>Sign In</h2>
+  <input type="email" id="email" placeholder="Email" required />
+  <input type="password" id="signupKey" placeholder="Signup Key" required />
+  <button onclick="signIn()">Sign In</button>
+</div>
+
+<script>
+  function signIn() {
+    const email = document.getElementById('email').value.trim();
+    const signupKey = document.getElementById('signupKey').value.trim();
+
+    if (!email || !signupKey) {
+      alert("Please fill in both fields.");
+      return;
+    }
+
+    const params = new URLSearchParams({
+      action: "signin",
+      email,
+      signupKey
+    });
+
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzcXpTRd4Rlv5VQvsCNv85M_W6PvFFsteB-pDJlsJZbo93QLUjMw6RgQJzJdJEtrgel/exec?" + params.toString();
+
+    fetch(scriptURL)
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          localStorage.setItem("currentUser", email);
+          localStorage.setItem("currentPass", signupKey);
+          alert(`Welcome back, ${result.user.name}!`);
+          window.location.href = "profile.html";
+        } else {
+          alert("Invalid email or signup key.");
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("An error occurred. Please try again later.");
+      });
+  }
+</script>
+</body>
+</html>
