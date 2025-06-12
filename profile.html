@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile - Raghav Handloom</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fdfaf6;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .profile-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .profile-info p {
+      margin: 0.5rem 0;
+    }
+
+    .action-buttons {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .action-buttons button {
+      padding: 10px;
+      background-color: #b97b56;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .action-buttons button:hover {
+      background-color: #a76944;
+    }
+
+    .review-section textarea {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .review-section ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .review-section li {
+      background: #f4f4f4;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
+
+    .order {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .order-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .order-item {
+      width: 100px;
+      text-align: center;
+    }
+
+    .order-item img {
+      width: 100%;
+      height: 80px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+
+    .empty-msg {
+      color: #777;
+    }
+
+    #loginRedirect {
+      background-color: #007bff;
+    }
+
+    #loginRedirect:hover {
+      background-color: #0056b3;
+    }
+
+    #editProfileSection input {
+      width: 100%;
+      margin: 5px 0 15px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+  <button onclick="window.location.href='index.html'" style="padding: 8px 16px; background-color: #b97b56; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">🏠 Home</button>
+  <h2 style="margin: 0;">Your Profile</h2>
+</div>
+    <div class="profile-info" id="profileData">Loading profile...</div>
+
+    <div class="action-buttons" id="profileButtons" style="display: none;">
+      <button onclick="toggleOrders()">🧾 Your Orders</button>
+      <button onclick="toggleEditProfile()">✏️ Edit Profile</button>
+      <button onclick="logout()">🔓 Logout</button>
+    </div>
+
+    <div class="action-buttons" id="loginButtons" style="display: none;">
+      <button id="loginRedirect" onclick="goToSignup()">🔐 Login / Sign Up</button>
+    </div>
+
+    <div id="ordersSection" style="display: none;">
+      <h3>Your Orders</h3>
+      <div id="ordersContainer"></div>
+    </div>
+
+    <div class="review-section" id="reviewSection" style="display: none;">
+      <h3>Leave a Review</h3>
+      <textarea id="reviewText" rows="3" placeholder="Write your review..."></textarea>
+      <button onclick="submitReview()">Submit Review</button>
+      <button onclick="toggleReviews()">All Reviews</button>
+
+      <div id="allReviews" style="display: none;">
+        <h3>All Reviews</h3>
+        <ul id="reviewList"></ul>
+      </div>
+    </div>
+
+    <div id="editProfileSection" style="display:none; margin-top:2rem;">
+      <h3>Edit Profile</h3>
+      <label>Name</label>
+      <input type="text" id="editName" placeholder="Name" />
+      <label>Email</label>
+      <input type="email" id="editEmail" placeholder="Email" />
+      <label>Phone</label>
+      <input type="tel" id="editPhone" placeholder="Phone" />
+      <label>Address</label>
+      <input type="text" id="editAddress" placeholder="Address" />
+      <label>PIN Code</label>
+      <input type="text" id="editPincode" placeholder="PIN Code" />
+      <label>Password</label>
+      <input type="password" id="editPassword" placeholder="New Password" />
+      <button onclick="saveProfileChanges()">💾 Save Changes</button>
+    </div>
+  </div>
+
+  <script>
+    const email = localStorage.getItem("currentUser");
+    const password = localStorage.getItem("currentPass");
+    const cachedUser = JSON.parse(localStorage.getItem("user") || "null");
+    const profileDiv = document.getElementById('profileData');
+    const profileButtons = document.getElementById('profileButtons');
+    const loginButtons = document.getElementById('loginButtons');
+    const reviewSection = document.getElementById('reviewSection');
+    const reviewList = document.getElementById('reviewList');
+    const ordersSection = document.getElementById('ordersSection');
+    const ordersContainer = document.getElementById('ordersContainer');
+    let user = null;
+
+    if (!email || !password) {
+      profileDiv.innerHTML = "<p>No user information found. Please sign in.</p>";
+      loginButtons.style.display = "flex";
+      } else if (cachedUser && cachedUser.email === email) {
+  user = cachedUser;
+  displayUserProfile(user);
+    } else {
+      const scriptURL = `https://script.google.com/macros/s/AKfycbzcXpTRd4Rlv5VQvsCNv85M_W6PvFFsteB-pDJlsJZbo93QLUjMw6RgQJzJdJEtrgel/exec?action=getUser&email=${encodeURIComponent(email)}&signupKey=${encodeURIComponent(password)}`;
+
+      fetch(scriptURL)
+        .then(response => response.json())
+        .then(data => {
+          if (!data.success || !data.user) {
+            profileDiv.innerHTML = "<p>Unable to load profile. Invalid credentials.</p>";
+            return;
+          }
+
+          user = data.user;
+         localStorage.setItem("user", JSON.stringify(user));
+           displayUserProfile(user);
+          // profileDiv.innerHTML = `
+          //   <p><strong>Name:</strong> ${user.name}</p>
+          //   <p><strong>Email:</strong> ${user.email}</p>
+          //   <p><strong>Phone:</strong> ${user.phone}</p>
+          //   <p><strong>Address:</strong> ${user.address || "Not provided"}</p>
+          //   <p><strong>PIN Code:</strong> ${user.pincode || "Not provided"}</p>
+          // `;
+
+          // profileButtons.style.display = "flex";
+          // reviewSection.style.display = "block";
+          // displayReviews();
+        })
+        .catch(error => {
+          console.error("Error loading profile:", error);
+          profileDiv.innerHTML = "<p>Error loading profile. Please try again.</p>";
+        });
+    }
+
+    function logout() {
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("currentPass");
+       localStorage.removeItem("user");
+      window.location.reload();
+    }
+
+    function goToSignup() {
+      window.location.href = "signup.html";
+    }
+function displayUserProfile(u) {
+  profileDiv.innerHTML = `
+    <p><strong>Name:</strong> ${u.name}</p>
+    <p><strong>Email:</strong> ${u.email}</p>
+    <p><strong>Phone:</strong> ${u.phone}</p>
+    <p><strong>Address:</strong> ${u.address || "Not provided"}</p>
+    <p><strong>PIN Code:</strong> ${u.pincode || "Not provided"}</p>
+  `;
+
+  profileButtons.style.display = "flex";
+  reviewSection.style.display = "block";
+  displayReviews();
+}
+    function toggleReviews() {
+      const reviewDiv = document.getElementById("allReviews");
+      reviewDiv.style.display = reviewDiv.style.display === "none" ? "block" : "none";
+      if (reviewDiv.style.display === "block") displayReviews();
+    }
+
+    function submitReview() {
+      const reviewText = document.getElementById("reviewText").value.trim();
+      if (!user) return alert("Please login to submit a review.");
+      if (reviewText === "") return alert("Please write something!");
+      let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+      reviews.push({ user: user.name, review: reviewText });
+      localStorage.setItem("reviews", JSON.stringify(reviews));
+      document.getElementById("reviewText").value = "";
+      displayReviews();
+    }
+
+    function displayReviews() {
+      const reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+      reviewList.innerHTML = "";
+      reviews.forEach(r => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${r.user}:</strong> ${r.review}`;
+        reviewList.appendChild(li);
+      });
+    }
+
+    function toggleOrders() {
+      if (ordersSection.style.display === "none") {
+        ordersSection.style.display = "block";
+        showOrders();
+      } else {
+        ordersSection.style.display = "none";
+      }
+    }
+
+    function showOrders() {
+      const allOrders = JSON.parse(localStorage.getItem("userOrders") || "{}");
+      const orders = allOrders[user?.email] || [];
+      ordersContainer.innerHTML = "";
+
+      if (orders.length === 0) {
+        ordersContainer.innerHTML = `<p class="empty-msg">You have no orders yet.</p>`;
+        return;
+      }
+
+      orders.forEach((order, index) => {
+        const orderDiv = document.createElement("div");
+        orderDiv.className = "order";
+
+        const date = new Date(order.date).toLocaleString();
+        let itemsHTML = "";
+
+        order.items.forEach(item => {
+          itemsHTML += `
+            <div class="order-item">
+              <img src="${item.image || `img/${item.name}.jpg`}" alt="${item.name}" />
+              <div>${item.name}</div>
+              <div>Qty: ${item.quantity}</div>
+            </div>
+          `;
+        });
+
+        orderDiv.innerHTML = `
+          <p><strong>Order #${index + 1}</strong></p>
+          <p><strong>Order Date:</strong> ${date}</p>
+          <div class="order-items">${itemsHTML}</div>
+          <p><strong>Total:</strong> ₹${order.total}</p>
+        `;
+
+        ordersContainer.appendChild(orderDiv);
+      });
+    }
+
+    function toggleEditProfile() {
+      const editSection = document.getElementById("editProfileSection");
+      document.getElementById("editName").value = user.name;
+      document.getElementById("editEmail").value = user.email;
+      document.getElementById("editPhone").value = user.phone;
+      document.getElementById("editAddress").value = user.address || "";
+      document.getElementById("editPassword").value = user.password || "";
+      document.getElementById("editPincode").value = user.pincode || "";
+      editSection.style.display = editSection.style.display === "none" ? "block" : "none";
+    }
+
+function saveProfileChanges() {
+  const newName = document.getElementById("editName").value.trim();
+  const newEmail = document.getElementById("editEmail").value.trim();
+  const newPhone = document.getElementById("editPhone").value.trim();
+  const newPassword = document.getElementById("editPassword").value.trim();
+  const newAddress = document.getElementById("editAddress").value.trim();
+  const newPincode = document.getElementById("editPincode").value.trim();
+
+  if (!newName || !newEmail || !newPhone || !newPassword || !newAddress || !newPincode) {
+    alert("Please fill out all fields.");
+    return;
+  }
+
+  if (!/^\d{6}$/.test(newPincode)) {
+    alert("Enter a valid 6-digit Indian PIN code.");
+    return;
+  }
+
+  const updateUrl = `https://script.google.com/macros/s/AKfycbwxnHEhUdoA4W0aPDN-gej9SfMDLOUNF9h_2LC9bawMzbmSDQwPn8SgP6lmCHUiAGZntg/exec?mode=updateProfile&email=${encodeURIComponent(email)}&name=${encodeURIComponent(newName)}&phone=${encodeURIComponent(newPhone)}&signupKey=${encodeURIComponent(newPassword)}&address=${encodeURIComponent(newAddress)}&pincode=${encodeURIComponent(newPincode)}`;
+
+  fetch(updateUrl)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        // localStorage.setItem("currentUser", newEmail);
+        // localStorage.setItem("currentPass", newPassword);
+        user = {
+  name: newName,
+  email: newEmail,
+  phone: newPhone,
+  address: newAddress,
+  pincode: newPincode,
+  password: newPassword
+        };
+           localStorage.setItem("currentUser", newEmail);
+        localStorage.setItem("currentPass", newPassword);
+        localStorage.setItem("user", JSON.stringify(user));
+        alert("Profile updated successfully!");
+        profileDiv.innerHTML = `
+          <p><strong>Name:</strong> ${newName}</p>
+          <p><strong>Email:</strong> ${newEmail}</p>
+          <p><strong>Phone:</strong> ${newPhone}</p>
+          <p><strong>Address:</strong> ${newAddress}</p>
+          <p><strong>PIN Code:</strong> ${newPincode}</p>
+        `;
+
+        document.getElementById("editProfileSection").style.display = "none";
+      } else {
+        alert("Failed to update profile: " + data.message);
+      }
+    })
+    .catch(err => {
+      console.error("Error updating profile:", err);
+      alert("An error occurred. Please try again.");
+    });
+}
+
+  </script>
+</body>
+</html>
