@@ -344,16 +344,15 @@ function showOrders() {
         const orderDiv = document.createElement("div");
         orderDiv.className = "order";
 
-        const date = order.Date || order.Timestamp || "N/A";
-        const payment = order["Payment Mode"] || "Unknown";
-        const items = order["Product Name"] || "Unnamed Product";
-        const total = order["Amount"] || order["Total"] || "N/A";
+        const date = new Date(order["Timestamp"]).toLocaleString();
+        const payment = order["Payment Method"] || "Unknown";
+        const items = order["Cart Details"] || "Unnamed Product";
+        const total = order["Total"] || "N/A";
         const id = order["Order ID"] || `#${index + 1}`;
 
         orderDiv.innerHTML = `
-          <p><strong>Order ID:</strong> ${id}</p>
-          <p><strong>Product:</strong> ${items}</p>
-          <p><strong>Payment Mode:</strong> ${payment}</p>
+          <p><strong>Cart Details:</strong> ${items}</p>
+          <p><strong>Payment Method:</strong> ${payment}</p>
           <p><strong>Date:</strong> ${date}</p>
           <p><strong>Total:</strong> ₹${total}</p>
         `;
