@@ -191,7 +191,7 @@
   user = cachedUser;
   displayUserProfile(user);
     } else {
-      const scriptURL = `https://script.google.com/macros/s/AKfycbyeOVKRheVd3Akc7ErKvaOC_sP_1r858iMHnhpYmslCU2KaRh87Z848MqhFFYJDBLnguQ/exec?action=getUser&email=${encodeURIComponent(email)}&signupKey=${encodeURIComponent(password)}`;
+      const scriptURL = `https://script.google.com/macros/s/AKfycbzglg8wl6pTHY8TBD62ADAFd103HMEp7CB0k9qegT96JFnCuF_PogCAyIwT81YRLRj6tw/exec?action=getUser&email=${encodeURIComponent(email)}&signupKey=${encodeURIComponent(password)}`;
 
       fetch(scriptURL)
         .then(response => response.json())
@@ -324,7 +324,7 @@ function showOrders() {
     return;
   }
 
-  const apiUrl = `https://script.google.com/macros/s/AKfycbyeOVKRheVd3Akc7ErKvaOC_sP_1r858iMHnhpYmslCU2KaRh87Z848MqhFFYJDBLnguQ/exec?mode=getOrders&email=${encodeURIComponent(user.email)}`;
+  const apiUrl = `https://script.google.com/macros/s/AKfycbzglg8wl6pTHY8TBD62ADAFd103HMEp7CB0k9qegT96JFnCuF_PogCAyIwT81YRLRj6tw/exec?mode=getOrders&email=${encodeURIComponent(user.email)}`;
   
   ordersContainer.innerHTML = `<p>Loading orders...</p>`;
 
@@ -400,7 +400,7 @@ function saveProfileChanges() {
     return;
   }
 
-  const updateUrl = `https://script.google.com/macros/s/AKfycbyeOVKRheVd3Akc7ErKvaOC_sP_1r858iMHnhpYmslCU2KaRh87Z848MqhFFYJDBLnguQ/exec?mode=updateProfile&email=${encodeURIComponent(email)}&name=${encodeURIComponent(newName)}&phone=${encodeURIComponent(newPhone)}&signupKey=${encodeURIComponent(newPassword)}&address=${encodeURIComponent(newAddress)}&pincode=${encodeURIComponent(newPincode)}`;
+  const updateUrl = `https://script.google.com/macros/s/AKfycbzglg8wl6pTHY8TBD62ADAFd103HMEp7CB0k9qegT96JFnCuF_PogCAyIwT81YRLRj6tw/exec?mode=updateProfile&email=${encodeURIComponent(email)}&name=${encodeURIComponent(newName)}&phone=${encodeURIComponent(newPhone)}&signupKey=${encodeURIComponent(newPassword)}&address=${encodeURIComponent(newAddress)}&pincode=${encodeURIComponent(newPincode)}`;
 
   fetch(updateUrl)
     .then(res => res.json())
