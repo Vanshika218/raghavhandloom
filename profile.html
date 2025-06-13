@@ -343,22 +343,16 @@ function showOrders() {
       allOrders.forEach((order, index) => {
         const orderDiv = document.createElement("div");
         orderDiv.className = "order";
-      const screenshot = order["  Screenshot Upload  "]?.toString() || "Unknown";
       const payment = order["  Payment Method  "]?.toString() || "Unknown";
-// const items = order["  Cart Details  "]?.toString() || "Unnamed Product";
         let itemsRaw = order["  Cart Details  "]?.toString() || "Unnamed Product";
 let items = itemsRaw.replace(/\[Image\]\((.*?)\)/g, '<br><img src="$1" alt="Item image" style="max-width:100px; border-radius:6px;" /><br>');
 
 const total = order["  Total  "]?.toString() || "N/A";
 const dateRaw = order["Timestamp"];
 const date = dateRaw ? new Date(dateRaw).toLocaleString() : "Unknown";
-// <p><strong> Screenshot Upload :</strong> ${screenshot}</p>
         orderDiv.innerHTML = `
           <p><strong> Cart Details :</strong> ${items}</p>
           <p><strong> Payment Method :</strong> ${payment}</p>
-          <p><strong> Screenshot Upload :</strong><br>
-  <img src="${screenshot}" alt="Screenshot" style="max-width:100%; max-height:200px; border-radius:8px;" />
-</p>
           <p><strong>Date:</strong> ${date}</p>
           <p><strong> Total :</strong> ₹${total}</p>
         `;
