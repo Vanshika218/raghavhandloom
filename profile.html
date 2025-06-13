@@ -343,10 +343,10 @@ function showOrders() {
       allOrders.forEach((order, index) => {
         const orderDiv = document.createElement("div");
         orderDiv.className = "order";
-      const screenshot = order[" Screenshot Upload "]?.toString() || "Unknown";
-      const payment = order[" Payment Method "]?.toString() || "Unknown";
-const items = order[" Cart Details "]?.toString() || "Unnamed Product";
-const total = order[" Total "]?.toString() || "N/A";
+      const screenshot = order["  Screenshot Upload  "]?.toString() || "Unknown";
+      const payment = order["  Payment Method  "]?.toString() || "Unknown";
+const items = order["  Cart Details  "]?.toString() || "Unnamed Product";
+const total = order["  Total  "]?.toString() || "N/A";
 const dateRaw = order["Timestamp"];
 const date = dateRaw ? new Date(dateRaw).toLocaleString() : "Unknown";
 
