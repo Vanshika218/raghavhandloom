@@ -122,163 +122,29 @@
   </div>
 
   <script>
-    try {
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const cartContainer = document.getElementById("cart-items");
-      const subtotalAmountEl = document.getElementById("subtotal-amount");
-      const deliveryChargeEl = document.getElementById("delivery-charge");
-      const totalAmountEl = document.getElementById("total-amount");
-      const paymentMethodSelect = document.getElementById("payment-method");
-      const submitBtn = document.getElementById("submit-btn");
-      const qrCodeSection = document.getElementById("qr-code-section");
-      const googleFormSection = document.getElementById("google-form-section");
-
-      let total = 0;
-      let googleFormFilled = false;
-
-      if (cart.length === 0) {
-        alert("Cart is empty! Redirecting to cart page.");
-        window.location.href = "cart.html";
-      }
-
+    const previousPage = window.location.href;
+    function openPrefilledGoogleForm() {
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const pincode = document.getElementById("pincode").value.trim();
+      let cartDetails = "";
       cart.forEach(item => {
-        const name = item.name || "Unnamed Product";
-        const price = Number(item.price) || 0;
-        const quantity = Number(item.quantity) || 1;
-        const subtotal = price * quantity;
-        total += subtotal;
-        const p = document.createElement("p");
-        p.textContent = `${name} x ${quantity} = ₹${subtotal.toFixed(2)}`;
-        cartContainer.appendChild(p);
+        const product = item.name || "Unnamed";
+        const quantity = item.quantity || 1;
+        const price = item.price || 0;
+        const imageUrl = item.image || "";
+        const imageLink = imageUrl ? ` [Image](${imageUrl})` : "";
+        cartDetails += `${product} x${quantity} = ₹${(price * quantity).toFixed(2)}${imageLink}\n`;
       });
-
-      function calculateDeliveryCharge() {
-        return cart.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) * 30;
-      }
-
-      function updateAmounts() {
-        const deliveryCharge = calculateDeliveryCharge();
-        subtotalAmountEl.textContent = total.toFixed(2);
-        deliveryChargeEl.textContent = deliveryCharge.toFixed(2);
-        totalAmountEl.textContent = (total + deliveryCharge).toFixed(2);
-        return deliveryCharge;
-      }
-
-      let deliveryCharge = updateAmounts();
-
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      if (user.name) document.getElementById("name").value = user.name;
-      if (user.phone) document.getElementById("phone").value = user.phone;
-      if (user.email) document.getElementById("email").value = user.email;
-      if (user.address) document.getElementById("address").value = user.address;
-      if (user.pincode) document.getElementById("pincode").value = user.pincode;
-
-      function validateForm() {
-        const name = document.getElementById("name").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const address = document.getElementById("address").value.trim();
-        const pincode = document.getElementById("pincode").value.trim();
-        const paymentMethod = paymentMethodSelect.value;
-
-        if (!name || !phone || !email || !address || !pincode || !paymentMethod) return false;
-        if (!/^\d{6}$/.test(pincode)) return false;
-        if (!/^[6-9]\d{9}$/.test(phone)) return false;
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
-        if (paymentMethod === "UPI (Paytm / Google Pay / Phone Pay)" && !googleFormFilled) return false;
-        return true;
-      }
-
-      function updateUIOnPaymentMethodChange() {
-        const paymentMethod = paymentMethodSelect.value;
-        if (paymentMethod === "Cash on Delivery") {
-          googleFormSection.classList.add("hidden");
-          qrCodeSection.classList.add("hidden");
-          googleFormFilled = true;
-        } else if (paymentMethod === "UPI (Paytm / Google Pay / Phone Pay)") {
-          googleFormSection.classList.remove("hidden");
-          qrCodeSection.classList.remove("hidden");
-          googleFormFilled = false;
-        } else {
-          googleFormSection.classList.add("hidden");
-          qrCodeSection.classList.add("hidden");
-          googleFormFilled = false;
-        }
-        submitBtn.disabled = !validateForm();
-      }
-
-      paymentMethodSelect.addEventListener("change", updateUIOnPaymentMethodChange);
-      ["name", "phone", "email", "address", "pincode"].forEach(id => {
-        document.getElementById(id).addEventListener("input", () => {
-          if (id === "pincode") deliveryCharge = updateAmounts();
-          submitBtn.disabled = !validateForm();
-        });
-      });
-
-      function openPrefilledGoogleForm() {
-        const name = document.getElementById("name").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const address = document.getElementById("address").value.trim();
-        const pincode = document.getElementById("pincode").value.trim();
-        let cartDetails = "";
-        cart.forEach(item => {
-          const product = item.name || "Unnamed";
-          const quantity = item.quantity || 1;
-          const price = item.price || 0;
-          const imageUrl = item.image || "";
-          const imageLink = imageUrl ? ` [Image](${imageUrl})` : "";
-          cartDetails += `${product} x${quantity} = ₹${(price * quantity).toFixed(2)}${imageLink}\n`;
-        });
-        const totalFormatted = total.toFixed(2);
-        const baseURL = "https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url";
-        const fullURL = `${baseURL}&entry.552548492=${encodeURIComponent(name)}&entry.257981681=${encodeURIComponent(phone)}&entry.1920841676=${encodeURIComponent(email)}&entry.340525268=${encodeURIComponent(address)}&entry.1264909969=${encodeURIComponent(pincode)}&entry.216020480=${encodeURIComponent(cartDetails)}&entry.1584322114=${encodeURIComponent(totalFormatted)}&entry.1131349200=${encodeURIComponent(paymentMethodSelect.value)}`;
-        window.open(fullURL, "_blank");
-        googleFormFilled = true;
-        submitBtn.disabled = !validateForm();
-      }
-
-      submitBtn.addEventListener("click", () => {
-        if (!validateForm()) {
-          alert("Please complete the form and include valid details.");
-          return;
-        }
-        const order = {
-          date: new Date().toISOString(),
-          items: cart,
-          subtotal: total.toFixed(2),
-          deliveryCharge: deliveryCharge.toFixed(2),
-          total: (total + deliveryCharge).toFixed(2),
-          customer: {
-            name: document.getElementById("name").value.trim(),
-            phone: document.getElementById("phone").value.trim(),
-            email: document.getElementById("email").value.trim(),
-            address: document.getElementById("address").value.trim(),
-            pincode: document.getElementById("pincode").value.trim()
-          },
-          paymentMethod: paymentMethodSelect.value
-        };
-        const allOrders = JSON.parse(localStorage.getItem("userOrders") || "{}");
-        const userOrders = allOrders[order.customer.email] || [];
-        userOrders.push(order);
-        allOrders[order.customer.email] = userOrders;
-        localStorage.setItem("userOrders", JSON.stringify(allOrders));
-        localStorage.removeItem("cart");
-
-        if (order.paymentMethod === "Cash on Delivery") {
-          const codBase = "https://docs.google.com/forms/d/e/1FAIpQLScB9r5MtB3HBNKa6kzOCZWz2sf4X0ZN1Gik0HefGCyQvgvSvw/viewform?usp=pp_url";
-          const codURL = `${codBase}&entry.727221695=${encodeURIComponent(order.customer.name)}&entry.587011233=${encodeURIComponent(order.customer.phone)}&entry.671837471=${encodeURIComponent(order.customer.email)}&entry.1798396967=${encodeURIComponent(order.customer.address)}&entry.916509460=${encodeURIComponent(order.customer.pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(order.paymentMethod)}`;
-          window.open(codURL, "_blank");
-        }
-
-        document.body.innerHTML = `<div style="font-family: Arial, sans-serif; text-align: center; padding: 100px 20px;"><h1 style="color: green; font-size: 2.5rem;">✅ Your order is confirmed!</h1><p style="font-size: 1.2rem;">Thank you for shopping with us. Redirecting to home...</p></div>`;
-        setTimeout(() => window.location.href = "index.html", 4000);
-      });
-
-      updateUIOnPaymentMethodChange();
-    } catch (error) {
-      console.error("Error in payment page script:", error);
-      alert("Something went wrong loading payment details. Please refresh and try again.");
+      const totalFormatted = total.toFixed(2);
+      const baseURL = "https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url";
+      const redirectParam = `&continue=${encodeURIComponent(previousPage)}`;
+      const fullURL = `${baseURL}&entry.552548492=${encodeURIComponent(name)}&entry.257981681=${encodeURIComponent(phone)}&entry.1920841676=${encodeURIComponent(email)}&entry.340525268=${encodeURIComponent(address)}&entry.1264909969=${encodeURIComponent(pincode)}&entry.216020480=${encodeURIComponent(cartDetails)}&entry.1584322114=${encodeURIComponent(totalFormatted)}&entry.1131349200=${encodeURIComponent(paymentMethodSelect.value)}${redirectParam}`;
+      window.open(fullURL, "_blank");
+      googleFormFilled = true;
+      submitBtn.disabled = !validateForm();
     }
   </script>
 
