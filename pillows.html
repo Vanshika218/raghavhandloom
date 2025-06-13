@@ -175,6 +175,7 @@
     url = url.replace(/^"+|"+$/g, '').trim();
     url = url.split(',')[0].trim();
     if (url.startsWith('img/')) return url;
+    if (url.startsWith('im/')) return url;
     if (url.startsWith('http')) return url;
     return 'img/' + url; 
   }
