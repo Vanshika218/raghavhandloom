@@ -324,22 +324,13 @@ function showOrders() {
     return;
   }
 
+  const url = `https://script.google.com/macros/s/AKfycbzjrL0PGcXOPZjJnguVzn6DGl36qDFCGgy7lzo4IA0wFRfNGNJ5C0l_6XaV9fL0xmXrsQ/exec?mode=getOrders&email=${encodeURIComponent(user.email)}`;
+
   ordersContainer.innerHTML = `<p>Loading orders...</p>`;
 
-  return new Promise((resolve, reject) => {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = `https://script.google.com/macros/s/AKfycbzjrL0PGcXOPZjJnguVzn6DGl36qDFCGgy7lzo4IA0wFRfNGNJ5C0l_6XaV9fL0xmXrsQ/exec?mode=getOrders&email=${encodeURIComponent(user.email)}`;
-
-    function handleMessage(event) {
-      if (!event.origin.includes("script.google.com")) return;
-
-      window.removeEventListener("message", handleMessage);
-      document.body.removeChild(iframe);
-
-      const data = event.data;
-
-      // ✅ Display orders here
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
       const allOrders = [...(data.upiOrders || []), ...(data.codOrders || [])];
 
       if (allOrders.length === 0) {
@@ -347,7 +338,7 @@ function showOrders() {
         return;
       }
 
-      ordersContainer.innerHTML = ""; // clear loading
+      ordersContainer.innerHTML = "";
 
       allOrders.forEach((order, index) => {
         const orderDiv = document.createElement("div");
@@ -369,13 +360,11 @@ function showOrders() {
 
         ordersContainer.appendChild(orderDiv);
       });
-
-      resolve(data);
-    }
-
-    window.addEventListener("message", handleMessage);
-    document.body.appendChild(iframe);
-  });
+    })
+    .catch(err => {
+      console.error("Failed to fetch orders:", err);
+      ordersContainer.innerHTML = `<p class="empty-msg">Error loading orders.</p>`;
+    });
 }
 
     function toggleEditProfile() {
