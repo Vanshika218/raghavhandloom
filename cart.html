@@ -11,6 +11,7 @@
       margin: 0;
       padding: 0;
     }
+
     header {
       background-color: #333;
       color: #fff;
@@ -18,39 +19,55 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
     }
+
     .shop-name {
       font-family: 'Cursive', sans-serif;
       font-size: 1.5rem;
       color: #ffcc00;
     }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin-right: 15px;
+      font-size: 1rem;
+    }
+
     main {
       padding: 2rem;
     }
+
     h2 {
       text-align: center;
       margin-bottom: 2rem;
       color: #333;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 1rem;
     }
+
     th, td {
       padding: 12px;
       border: 1px solid #ccc;
       text-align: center;
     }
+
     th {
       background-color: #f0f0f0;
     }
+
     .total {
       text-align: right;
       margin-top: 1rem;
       font-size: 1.2rem;
       font-weight: bold;
     }
+
     .clear-btn {
       margin-top: 20px;
       display: block;
@@ -61,12 +78,61 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
     footer {
       text-align: center;
       padding: 1rem;
       background-color: #333;
       color: #fff;
       margin-top: 2rem;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      main {
+        padding: 1rem;
+      }
+
+      table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+      }
+
+      td {
+        padding: 10px;
+        text-align: left;
+        border: none;
+        position: relative;
+      }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+      }
+
+      .clear-btn {
+        width: 100%;
+        font-size: 1rem;
+      }
+
+      .total {
+        text-align: center;
+        font-size: 1.1rem;
+      }
     }
   </style>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -75,7 +141,7 @@
 <header>
   <div class="shop-name">Raghav Handloom</div>
   <nav>
-    <a href="index.html" style="color: #fff; text-decoration: none; margin-right: 15px;">Home</a>
+    <a href="index.html">Home</a>
   </nav>
 </header>
 
@@ -119,14 +185,14 @@
 
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>
+        <td data-label="Product">
           <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"><br>
           ${item.name}
         </td>
-        <td>₹${item.price}</td>
-        <td>${item.quantity || 1}</td>
-        <td>₹${itemTotal}</td>
-        <td>
+        <td data-label="Unit Price">₹${item.price}</td>
+        <td data-label="Quantity">${item.quantity || 1}</td>
+        <td data-label="Total">₹${itemTotal}</td>
+        <td data-label="Action">
           <button onclick="removeItem(${index})" style="background-color:red; color:white; border:none; padding:5px 10px; border-radius:4px;">Delete</button>
         </td>
       `;
