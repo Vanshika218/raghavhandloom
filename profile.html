@@ -191,7 +191,7 @@
   user = cachedUser;
   displayUserProfile(user);
     } else {
-      const scriptURL = `https://script.google.com/macros/s/AKfycbzjrL0PGcXOPZjJnguVzn6DGl36qDFCGgy7lzo4IA0wFRfNGNJ5C0l_6XaV9fL0xmXrsQ/exec?action=getUser&email=${encodeURIComponent(email)}&signupKey=${encodeURIComponent(password)}`;
+      const scriptURL = `https://script.google.com/macros/s/AKfycbxGLq1sQbnsTtqSQFk--4tFq2AsrBqko9gwTNwEZIdwd-CVCMeq6nn7MHkHlBfCg3fCYA/exec?action=getUser&email=${encodeURIComponent(email)}&signupKey=${encodeURIComponent(password)}`;
 
       fetch(scriptURL)
         .then(response => response.json())
@@ -324,7 +324,7 @@ function showOrders() {
     return;
   }
 
-  const url = `https://script.google.com/macros/s/AKfycbzjrL0PGcXOPZjJnguVzn6DGl36qDFCGgy7lzo4IA0wFRfNGNJ5C0l_6XaV9fL0xmXrsQ/exec?mode=getOrders&email=${encodeURIComponent(user.email)}`;
+  const url = `https://script.google.com/macros/s/AKfycbxGLq1sQbnsTtqSQFk--4tFq2AsrBqko9gwTNwEZIdwd-CVCMeq6nn7MHkHlBfCg3fCYA/exec?mode=getOrders&email=${encodeURIComponent(user.email)}`;
 
   ordersContainer.innerHTML = `<p>Loading orders...</p>`;
 
@@ -396,7 +396,7 @@ function saveProfileChanges() {
     return;
   }
 
-  const updateUrl = `https://script.google.com/macros/s/AKfycbzjrL0PGcXOPZjJnguVzn6DGl36qDFCGgy7lzo4IA0wFRfNGNJ5C0l_6XaV9fL0xmXrsQ/exec?mode=updateProfile&email=${encodeURIComponent(email)}&name=${encodeURIComponent(newName)}&phone=${encodeURIComponent(newPhone)}&signupKey=${encodeURIComponent(newPassword)}&address=${encodeURIComponent(newAddress)}&pincode=${encodeURIComponent(newPincode)}`;
+  const updateUrl = `https://script.google.com/macros/s/AKfycbxGLq1sQbnsTtqSQFk--4tFq2AsrBqko9gwTNwEZIdwd-CVCMeq6nn7MHkHlBfCg3fCYA/exec?mode=updateProfile&email=${encodeURIComponent(email)}&name=${encodeURIComponent(newName)}&phone=${encodeURIComponent(newPhone)}&signupKey=${encodeURIComponent(newPassword)}&address=${encodeURIComponent(newAddress)}&pincode=${encodeURIComponent(newPincode)}`;
 
   fetch(updateUrl)
     .then(res => res.json())
