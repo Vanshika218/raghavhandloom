@@ -344,8 +344,28 @@ function showOrders() {
         const orderDiv = document.createElement("div");
         orderDiv.className = "order";
       const payment = order["  Payment Method  "]?.toString() || "Unknown";
-        let itemsRaw = order["  Cart Details  "]?.toString() || "Unnamed Product";
-let items = itemsRaw.replace(/\[Image\]\((.*?)\)/g, '<br><img src="$1" alt="Item image" style="max-width:100px; border-radius:6px;" /><br>');
+//         let itemsRaw = order["  Cart Details  "]?.toString() || "Unnamed Product";
+// let items = itemsRaw.replace(/\[Image\]\((.*?)\)/g, '<br><img src="$1" alt="Item image" style="max-width:100px; border-radius:6px;" /><br>');
+let itemsRaw = order["  Cart Details  "]?.toString() || "Unnamed Product";
+let items = "";
+
+// Try to parse JSON cart if it's valid JSON
+try {
+  const parsedCart = JSON.parse(itemsRaw);
+  if (Array.isArray(parsedCart)) {
+    items = parsedCart.map(it => `
+      <div style="margin-bottom:10px;">
+        <img src="${it.image}" alt="${it.name}" style="max-width:100px; border-radius:6px;" /><br>
+        <strong>${it.name}</strong> x${it.quantity} = ₹${it.price}
+      </div>
+    `).join('');
+  } else {
+    throw "Not a valid array"; // Fallback to raw
+  }
+} catch (err) {
+  // Handle legacy format with [Image](url)
+  items = itemsRaw.replace(/\[Image\]\((.*?)\)/g, '<br><img src="$1" alt="Item image" style="max-width:100px; border-radius:6px;" /><br>');
+}
 
 const total = order["  Total  "]?.toString() || "N/A";
 const dateRaw = order["Timestamp"];
