@@ -279,7 +279,8 @@ function toggleGoogleForm() {
   setTimeout(() => {
     googleFormFilled = true;
     submitBtn.disabled = !validateForm();
-  }, 
+  }, 5000); // ✅ Now closed correctly
+}
       submitBtn.addEventListener("click", () => {
         if (!validateForm()) {
           alert("Please complete the form and include valid details.");
