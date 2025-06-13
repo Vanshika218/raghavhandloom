@@ -191,7 +191,7 @@
   user = cachedUser;
   displayUserProfile(user);
     } else {
-      const scriptURL = `https://script.google.com/macros/s/AKfycbzcXpTRd4Rlv5VQvsCNv85M_W6PvFFsteB-pDJlsJZbo93QLUjMw6RgQJzJdJEtrgel/exec?action=getUser&email=${encodeURIComponent(email)}&signupKey=${encodeURIComponent(password)}`;
+      const scriptURL = `https://script.google.com/macros/s/AKfycbzSHShnHSrxawwVVwr8R2zul_tkXSL5GeVPTgdWGvM9E_XMU0Lw4rWW0rFzPlnEhpvEMg/exec?action=getUser&email=${encodeURIComponent(email)}&signupKey=${encodeURIComponent(password)}`;
 
       fetch(scriptURL)
         .then(response => response.json())
@@ -400,7 +400,7 @@ function saveProfileChanges() {
     return;
   }
 
-  const updateUrl = `https://script.google.com/macros/s/AKfycbwxnHEhUdoA4W0aPDN-gej9SfMDLOUNF9h_2LC9bawMzbmSDQwPn8SgP6lmCHUiAGZntg/exec?mode=updateProfile&email=${encodeURIComponent(email)}&name=${encodeURIComponent(newName)}&phone=${encodeURIComponent(newPhone)}&signupKey=${encodeURIComponent(newPassword)}&address=${encodeURIComponent(newAddress)}&pincode=${encodeURIComponent(newPincode)}`;
+  const updateUrl = `https://script.google.com/macros/s/AKfycbzSHShnHSrxawwVVwr8R2zul_tkXSL5GeVPTgdWGvM9E_XMU0Lw4rWW0rFzPlnEhpvEMg/exec?mode=updateProfile&email=${encodeURIComponent(email)}&name=${encodeURIComponent(newName)}&phone=${encodeURIComponent(newPhone)}&signupKey=${encodeURIComponent(newPassword)}&address=${encodeURIComponent(newAddress)}&pincode=${encodeURIComponent(newPincode)}`;
 
   fetch(updateUrl)
     .then(res => res.json())
