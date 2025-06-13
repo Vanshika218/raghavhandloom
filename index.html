@@ -13,7 +13,7 @@
     }
 
     .background-hero {
-      background: url('img/b1.png') no-repeat center center fixed;
+      background: url('raghavhandloom/img/b1.png') no-repeat center center fixed;
       background-size: cover;
       width: 100%;
       height: 100vh;
@@ -30,6 +30,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
       z-index: 2;
     }
 
@@ -59,6 +60,7 @@
       gap: 20px;
       margin: 0;
       padding: 0;
+      align-items: center;
     }
 
     nav ul li a {
@@ -133,6 +135,7 @@
       color: #fff;
     }
 
+    /* Mobile responsiveness */
     @media (max-width: 768px) {
       .product-item {
         flex: 1 1 calc(45% - 20px);
@@ -140,6 +143,61 @@
 
       nav ul {
         gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .shop-name {
+        font-size: 1.2rem;
+      }
+
+      .hamburger {
+        margin-top: 10px;
+      }
+
+      .product-grid {
+        gap: 15px;
+      }
+
+      .product-item img {
+        height: 120px;
+      }
+
+      .product-item p {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .product-item {
+        flex: 1 1 100%;
+        max-width: 100%;
+      }
+
+      .logo {
+        height: 40px;
+      }
+
+      .shop-name {
+        font-size: 1rem;
+      }
+
+      nav ul li a {
+        font-size: 1.2rem;
+      }
+
+      .hamburger {
+        font-size: 16px;
+        padding: 5px 10px;
+      }
+
+      .about {
+        padding: 1.5rem 1rem;
       }
     }
   </style>
@@ -148,23 +206,22 @@
 
 <!-- Fullscreen Background with Header -->
 <div class="background-hero">
-<header>
-  <div style="display: flex; flex-direction: column; align-items: flex-start;">
-    <div style="display: flex; align-items: center;">
-      <img src="img/v.png" class="logo" alt="Logo">
-      <span class="shop-name">Raghav Handloom</span>
-  </div>
-</div>
-  <nav>
-    <ul>
-      <div class="hamburger" onclick="scrollToProducts()">☰ Explore Products</div>
-      <li><a href="index.html" title="Home">🏠</a></li>
-      <li><a href="cart.html" title="Cart">🛒</a></li>
-      <li><a href="signup.html" title="Signup">🙍‍♂➕</a></li>
-      <li><a href="profile.html" title="Profile">🙍‍♂️</a></li>
-    </ul>
-  </nav>
-</header>
+  <header>
+    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+      <div style="display: flex; align-items: center;">
+        <img src="raghavhandloom/img/v.png" class="logo" alt="Logo">
+        <span class="shop-name">Raghav Handloom</span>
+      </div>
+    </div>
+    <nav>
+      <ul>
+        <div class="hamburger" onclick="scrollToProducts()">☰ Explore Products</div>
+        <li><a href="index.html" title="Home">🏠</a></li>
+        <li><a href="cart.html" title="Cart">🛒</a></li>
+        <li><a href="signup.html" title="Profile">🙍‍♂️</a></li>
+      </ul>
+    </nav>
+  </header>
 </div>
 
 <!-- About Section -->
@@ -179,66 +236,16 @@
 <section class="product-section" id="productSection">
   <h2 style="text-align:center;">Explore Products</h2>
   <div class="product-grid">
-    <div class="product-item">
-      <a href="bedsheets.html">
-        <img src="img/a2.jpg" alt="Bedsheets">
-        <p>Bedsheets</p>
-      </a>
-    </div>
-    <div class="product-item">
-      <a href="sofa-covers.html">
-        <img src="img/b2.png" alt="Sofa Covers">
-        <p>Sofa Covers</p>
-      </a>
-    </div>
-    <div class="product-item">
-      <a href="pillows.html">
-        <img src="img/b4.png" alt="Pillows">
-        <p>Pillows</p>
-      </a>
-    </div>
-    <div class="product-item">
-      <a href="towels.html">
-        <img src="img/b6.png" alt="Towels">
-        <p>Towels</p>
-      </a>
-    </div>
-    <div class="product-item">
-      <a href="bedcovers.html">
-        <img src="img/b12.png" alt="Bedcovers">
-        <p>Bedcovers</p>
-      </a>
-    </div>
-    <div class="product-item">
-      <a href="comforters.html">
-        <img src="img/b9.png" alt="Comforters">
-        <p>Comforters</p>
-      </a>
-    </div>
-    <div class="product-item">
-      <a href="bed-side-runner.html">
-        <img src="img/b7.png" alt="Bed Side Runner">
-        <p>Bed Side Runner</p>
-      </a>
-    </div>
-    <div class="product-item">
-      <a href="doormats.html">
-        <img src="img/b10.jpg" alt="Doormats">
-        <p>Doormats</p>
-      </a>
-    </div>
-    <div class="product-item">
-      <a href="bathrobes.html">
-        <img src="img/b5.png" alt="Bathrobes">
-        <p>Bathrobes</p>
-      </a>
-    </div>
-    <div class="product-item">
-      <a href="quilts.html">
-        <img src="img/b13.png" alt="Quilts">
-        <p>Quilts</p>
-      </a>
-    </div>
+    <div class="product-item"><a href="bedsheets.html"><img src="raghavhandloom/img/a2.jpg" alt="Bedsheets"><p>Bedsheets</p></a></div>
+    <div class="product-item"><a href="sofa-covers.html"><img src="raghavhandloom/img/b2.png" alt="Sofa Covers"><p>Sofa Covers</p></a></div>
+    <div class="product-item"><a href="pillows.html"><img src="raghavhandloom/img/b4.png" alt="Pillows"><p>Pillows</p></a></div>
+    <div class="product-item"><a href="handkerchiefs.html"><img src="raghavhandloom/img/b6.png" alt="Towels"><p>Towels</p></a></div>
+    <div class="product-item"><a href="bedcovers.html"><img src="raghavhandloom/img/b12.png" alt="Bedcovers"><p>Bedcovers</p></a></div>
+    <div class="product-item"><a href="comforters.html"><img src="raghavhandloom/img/b9.png" alt="Comforters"><p>Comforters</p></a></div>
+    <div class="product-item"><a href="bed-side-runner.html"><img src="raghavhandloom/img/b7.png" alt="Bed Side Runner"><p>Bed Side Runner</p></a></div>
+    <div class="product-item"><a href="doormats.html"><img src="raghavhandloom/img/b10.jpg" alt="Doormats"><p>Doormats</p></a></div>
+    <div class="product-item"><a href="bathrobes.html"><img src="raghavhandloom/img/b5.png" alt="Bathrobes"><p>Bathrobes</p></a></div>
+    <div class="product-item"><a href="quilts.html"><img src="raghavhandloom/img/b13.png" alt="Quilts"><p>Quilts</p></a></div>
   </div>
 </section>
 
@@ -261,7 +268,7 @@
   if (currentUser === authorizedUser) {
     const nav = document.querySelector("nav ul");
     const adminLink = document.createElement("li");
-      nav.appendChild(adminLink);
+    nav.appendChild(adminLink);
   }
 </script>
 
