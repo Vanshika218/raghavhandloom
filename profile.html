@@ -281,44 +281,96 @@ function displayUserProfile(u) {
       }
     }
 
-    function showOrders() {
-      const allOrders = JSON.parse(localStorage.getItem("userOrders") || "{}");
-      const orders = allOrders[user?.email] || [];
-      ordersContainer.innerHTML = "";
+    // function showOrders() {
+    //   const allOrders = JSON.parse(localStorage.getItem("userOrders") || "{}");
+    //   const orders = allOrders[user?.email] || [];
+    //   ordersContainer.innerHTML = "";
 
-      if (orders.length === 0) {
+    //   if (orders.length === 0) {
+    //     ordersContainer.innerHTML = `<p class="empty-msg">You have no orders yet.</p>`;
+    //     return;
+    //   }
+
+    //   orders.forEach((order, index) => {
+    //     const orderDiv = document.createElement("div");
+    //     orderDiv.className = "order";
+
+    //     const date = new Date(order.date).toLocaleString();
+    //     let itemsHTML = "";
+
+    //     order.items.forEach(item => {
+    //       itemsHTML += `
+    //         <div class="order-item">
+    //           <img src="${item.image || `img/${item.name}.jpg`}" alt="${item.name}" />
+    //           <div>${item.name}</div>
+    //           <div>Qty: ${item.quantity}</div>
+    //         </div>
+    //       `;
+    //     });
+
+    //     orderDiv.innerHTML = `
+    //       <p><strong>Order #${index + 1}</strong></p>
+    //       <p><strong>Order Date:</strong> ${date}</p>
+    //       <div class="order-items">${itemsHTML}</div>
+    //       <p><strong>Total:</strong> ₹${order.total}</p>
+    //     `;
+
+    //     ordersContainer.appendChild(orderDiv);
+    //   });
+    // }
+function showOrders() {
+  if (!user || !user.email) {
+    ordersContainer.innerHTML = `<p class="empty-msg">Please log in to view your orders.</p>`;
+    return;
+  }
+
+  const apiUrl = `https://script.google.com/macros/s/AKfycbxsnjWr0knmn3esQw2UkQyvZj_fXswoYUo9hAyoMtNmDLOMzJWeLX4RZcErgcEAG3BEUw/exec?mode=getOrders&email=${encodeURIComponent(user.email)}`;
+  
+  ordersContainer.innerHTML = `<p>Loading orders...</p>`;
+
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      if (!data.success) {
+        ordersContainer.innerHTML = `<p class="empty-msg">Failed to fetch orders. Try again later.</p>`;
+        return;
+      }
+
+      const allOrders = [...(data.upiOrders || []), ...(data.codOrders || [])];
+
+      if (allOrders.length === 0) {
         ordersContainer.innerHTML = `<p class="empty-msg">You have no orders yet.</p>`;
         return;
       }
 
-      orders.forEach((order, index) => {
+      ordersContainer.innerHTML = ""; // clear loading
+
+      allOrders.forEach((order, index) => {
         const orderDiv = document.createElement("div");
         orderDiv.className = "order";
 
-        const date = new Date(order.date).toLocaleString();
-        let itemsHTML = "";
-
-        order.items.forEach(item => {
-          itemsHTML += `
-            <div class="order-item">
-              <img src="${item.image || `img/${item.name}.jpg`}" alt="${item.name}" />
-              <div>${item.name}</div>
-              <div>Qty: ${item.quantity}</div>
-            </div>
-          `;
-        });
+        const date = order.Date || order.Timestamp || "N/A";
+        const payment = order["Payment Mode"] || "Unknown";
+        const items = order["Product Name"] || "Unnamed Product";
+        const total = order["Amount"] || order["Total"] || "N/A";
+        const id = order["Order ID"] || `#${index + 1}`;
 
         orderDiv.innerHTML = `
-          <p><strong>Order #${index + 1}</strong></p>
-          <p><strong>Order Date:</strong> ${date}</p>
-          <div class="order-items">${itemsHTML}</div>
-          <p><strong>Total:</strong> ₹${order.total}</p>
+          <p><strong>Order ID:</strong> ${id}</p>
+          <p><strong>Product:</strong> ${items}</p>
+          <p><strong>Payment Mode:</strong> ${payment}</p>
+          <p><strong>Date:</strong> ${date}</p>
+          <p><strong>Total:</strong> ₹${total}</p>
         `;
 
         ordersContainer.appendChild(orderDiv);
       });
-    }
-
+    })
+    .catch(error => {
+      console.error("Error fetching orders:", error);
+      ordersContainer.innerHTML = `<p class="empty-msg">An error occurred. Please try again later.</p>`;
+    });
+}
     function toggleEditProfile() {
       const editSection = document.getElementById("editProfileSection");
       document.getElementById("editName").value = user.name;
