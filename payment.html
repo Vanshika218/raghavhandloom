@@ -10,6 +10,7 @@
       background: #f0f0f0;
       padding: 2rem;
     }
+
     .section {
       background: white;
       padding: 1.5rem;
@@ -17,11 +18,13 @@
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+
     label {
       display: block;
       margin-top: 1rem;
       font-weight: bold;
     }
+
     input, select, textarea, button {
       width: 100%;
       margin-top: 0.5rem;
@@ -32,6 +35,7 @@
       box-sizing: border-box;
       font-size: 1rem;
     }
+
     button {
       background: #28a745;
       color: white;
@@ -40,35 +44,41 @@
       cursor: pointer;
       transition: background 0.3s ease;
     }
+
     button:disabled {
       background: #999;
       cursor: not-allowed;
     }
+
     h2 {
       margin-bottom: 1rem;
     }
+
     .hidden {
       display: none;
     }
+
     .address-pincode-container {
       display: flex;
       gap: 1rem;
       align-items: flex-start;
     }
+
     .address-pincode-container textarea {
       flex: 2;
       resize: vertical;
     }
+
     .address-pincode-container .pincode-wrapper {
       flex: 1;
     }
+
     #qr-code-section img {
       max-width: 300px;
       display: block;
       margin: 0 auto;
     }
 
-    /* Responsive styles */
     @media (max-width: 600px) {
       body {
         padding: 1rem;
@@ -83,116 +93,153 @@
         width: 100%;
       }
 
+      h2, h3 {
+        text-align: center;
+      }
+
       button {
         font-size: 1.1rem;
         padding: 0.9rem;
-      }
-
-      h2, h3 {
-        text-align: center;
       }
 
       #qr-code-section img {
         width: 100%;
         max-width: 100%;
       }
-
-      #google-form-btn {
-        font-size: 1.1rem;
-      }
     }
   </style>
 </head>
 <body>
+<h2>🗳️ Review & Confirm Your Payment</h2>
 
-  <div class="section">
-    <h2>Confirm Your Order</h2>
+<div class="section" id="cart-summary">
+  <h3>🛍 Order Summary</h3>
+  <div id="cart-items"></div>
+  <p><strong>Subtotal: ₹<span id="subtotal-amount">0</span></strong></p>
+  <p><strong>Delivery Charge: ₹<span id="delivery-charge">0</span></strong></p>
+  <p><strong>Total (incl. Delivery): ₹<span id="total-amount">0</span></strong></p>
+</div>
 
-    <div id="cart-summary">
-      <h3>Your Cart Summary:</h3>
-      <ul id="cartItems"></ul>
-      <p id="cartTotal"></p>
+<div class="section">
+  <h3>👤 Customer Details</h3>
+  <label for="name">Full Name</label>
+  <input type="text" id="name" required />
+
+  <label for="phone">Phone Number</label>
+  <input type="tel" id="phone" required />
+
+  <label for="email">Email Address</label>
+  <input type="email" id="email" required />
+
+  <label for="address">Delivery Address</label>
+  <div class="address-pincode-container">
+    <textarea id="address" required rows="3" placeholder="Street, Area, etc."></textarea>
+    <div class="pincode-wrapper">
+      <label for="pincode">PIN Code</label>
+      <input type="text" id="pincode" required placeholder="e.g., 560001" maxlength="6" />
     </div>
-
-    <label for="name">Name:</label>
-    <input type="text" id="name" placeholder="Enter your name" required />
-
-    <label for="phone">Phone:</label>
-    <input type="tel" id="phone" placeholder="Enter phone number" required />
-
-    <label for="email">Email:</label>
-    <input type="email" id="email" placeholder="Enter your email" required />
-
-    <div class="address-pincode-container">
-      <div>
-        <label for="address">Address:</label>
-        <textarea id="address" rows="4" placeholder="Enter your address" required></textarea>
-      </div>
-      <div class="pincode-wrapper">
-        <label for="pincode">Pincode:</label>
-        <input type="text" id="pincode" placeholder="Enter pincode" required />
-      </div>
-    </div>
-
-    <button id="google-form-btn" onclick="openGoogleForm()">Submit Details in Google Form</button>
   </div>
+</div>
 
-  <div class="section" id="qr-code-section" class="hidden">
-    <h3>Pay Now via UPI</h3>
-    <p>Scan the QR code below using your UPI app:</p>
-    <img src="img/qr.jpg" alt="UPI QR Code">
-    <p><strong>UPI ID:</strong> example@upi</p>
+<div class="section">
+  <label for="payment-method">Payment Method</label>
+  <select id="payment-method" required>
+    <option value="" disabled selected>Select Payment Method</option>
+    <option value="UPI (Paytm / Google Pay / Phone Pay)">UPI (Paytm / Google Pay / Phone Pay)</option>
+    <option value="Cash on Delivery">Cash on Delivery</option>
+  </select>
+</div>
 
-    <button onclick="markFormSubmitted()">Submit Screenshot</button>
-  </div>
+<div class="section hidden" id="qr-code-section">
+  <h3>📲 Scan to Pay</h3>
+  <img id="qr-code-img" src="img/a1.jpg" alt="UPI QR Code" />
+</div>
 
-  <div class="section hidden" id="confirm-section">
-    <button onclick="confirmPayment()">Confirm Payment</button>
-    <p id="confirmation-message" style="margin-top: 10px; font-weight: bold;"></p>
-  </div>
+<div class="section hidden" id="google-form-section">
+  <button type="button" id="google-form-btn" onclick="openPrefilledGoogleForm()">📝 Fill Google Form with Your Info</button>
+</div>
 
-  <script>
-    function openGoogleForm() {
-      const win = window.open("https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform", "_blank");
-      const checkClosed = setInterval(() => {
-        if (win.closed) {
-          clearInterval(checkClosed);
-          document.getElementById("qr-code-section").classList.remove("hidden");
-        }
-      }, 500);
+<div class="section">
+  <button id="submit-btn" disabled>✅ Confirm Payment</button>
+</div>
+
+<script>
+  const cartItemsDiv = document.getElementById("cart-items");
+  const subtotalAmountSpan = document.getElementById("subtotal-amount");
+  const deliveryChargeSpan = document.getElementById("delivery-charge");
+  const totalAmountSpan = document.getElementById("total-amount");
+  const nameInput = document.getElementById("name");
+  const phoneInput = document.getElementById("phone");
+  const emailInput = document.getElementById("email");
+  const addressInput = document.getElementById("address");
+  const pincodeInput = document.getElementById("pincode");
+  const paymentMethodSelect = document.getElementById("payment-method");
+  const qrCodeSection = document.getElementById("qr-code-section");
+  const googleFormSection = document.getElementById("google-form-section");
+  const submitBtn = document.getElementById("submit-btn");
+
+  function loadCart() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let subtotal = 0;
+    cartItemsDiv.innerHTML = "";
+    cart.forEach((item, index) => {
+      const itemDiv = document.createElement("div");
+      itemDiv.innerHTML = `<p>${item.name} x ${item.quantity} - ₹${item.price * item.quantity}</p>`;
+      cartItemsDiv.appendChild(itemDiv);
+      subtotal += item.price * item.quantity;
+    });
+    subtotalAmountSpan.textContent = subtotal;
+    const deliveryCharge = subtotal >= 500 ? 0 : 50;
+    deliveryChargeSpan.textContent = deliveryCharge;
+    totalAmountSpan.textContent = subtotal + deliveryCharge;
+  }
+
+  function validateForm() {
+    const isFormValid =
+      nameInput.value.trim() &&
+      phoneInput.value.trim() &&
+      emailInput.value.trim() &&
+      addressInput.value.trim() &&
+      pincodeInput.value.trim() &&
+      paymentMethodSelect.value;
+    submitBtn.disabled = !isFormValid;
+  }
+
+  nameInput.addEventListener("input", validateForm);
+  phoneInput.addEventListener("input", validateForm);
+  emailInput.addEventListener("input", validateForm);
+  addressInput.addEventListener("input", validateForm);
+  pincodeInput.addEventListener("input", validateForm);
+  paymentMethodSelect.addEventListener("change", () => {
+    validateForm();
+    const method = paymentMethodSelect.value;
+    if (method.includes("UPI")) {
+      qrCodeSection.classList.remove("hidden");
+      googleFormSection.classList.remove("hidden");
+    } else {
+      qrCodeSection.classList.add("hidden");
+      googleFormSection.classList.add("hidden");
     }
+  });
 
-    function markFormSubmitted() {
-      document.getElementById("qr-code-section").classList.add("hidden");
-      document.getElementById("confirm-section").classList.remove("hidden");
-    }
+  function openPrefilledGoogleForm() {
+    const name = encodeURIComponent(nameInput.value);
+    const phone = encodeURIComponent(phoneInput.value);
+    const email = encodeURIComponent(emailInput.value);
+    const address = encodeURIComponent(addressInput.value);
+    const pincode = encodeURIComponent(pincodeInput.value);
+    const cart = encodeURIComponent(localStorage.getItem("cart") || "");
+    const url = `https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url&entry.552548492=${name}&entry.257981681=${phone}&entry.1920841676=${email}&entry.340525268=${address}&entry.216020480=${cart}&entry.1075064803=${pincode}`;
+    window.open(url, "_blank");
+  }
 
-    function confirmPayment() {
-      localStorage.removeItem("cart");
-      document.getElementById("confirmation-message").textContent = "✅ Your order is confirmed.";
-    }
+  submitBtn.addEventListener("click", () => {
+    alert("✅ Your order has been confirmed. You’ll get delivery updates shortly.");
+    localStorage.removeItem("cart");
+    window.location.href = "index.html";
+  });
 
-    function loadCartSummary() {
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const cartList = document.getElementById("cartItems");
-      const cartTotal = document.getElementById("cartTotal");
-      let total = 0;
-
-      cartList.innerHTML = "";
-
-      cart.forEach(item => {
-        const itemTotal = item.price * (item.quantity || 1);
-        total += itemTotal;
-        const li = document.createElement("li");
-        li.textContent = `${item.name} x ${item.quantity || 1} - ₹${itemTotal}`;
-        cartList.appendChild(li);
-      });
-
-      cartTotal.textContent = `Total: ₹${total}`;
-    }
-
-    window.onload = loadCartSummary;
-  </script>
-
+  loadCart();
+</script>
 </body>
 </html>
