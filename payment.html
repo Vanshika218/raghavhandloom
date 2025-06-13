@@ -245,7 +245,13 @@
         }
         const order = {
           date: new Date().toISOString(),
-          items: cart,
+          // items: cart,
+          items: cart.map(item => ({
+  name: item.name,
+  price: item.price,
+  quantity: item.quantity,
+  image: item.image || `img/${item.name.replace(/\s+/g, "_")}.jpg`
+})),
           subtotal: total.toFixed(2),
           deliveryCharge: deliveryCharge.toFixed(2),
           total: (total + deliveryCharge).toFixed(2),
