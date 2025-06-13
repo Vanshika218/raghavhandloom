@@ -204,7 +204,9 @@ async function loadCart() {
           ${item.name}
         </td>
         <td data-label="Unit Price">₹${item.price}</td>
-        <td data-label="Quantity">${item.quantity || 1}</td>
+        <td data-label="Quantity">
+  <input type="number" min="1" value="${item.quantity || 1}" onchange="updateQuantity(${index}, this.value)">
+</td>
         <td data-label="Total">₹${itemTotal}</td>
         <td data-label="Action">
           <button onclick="removeItem(${index})" style="background-color:red; color:white; border:none; padding:5px 10px; border-radius:4px;">Delete</button>
@@ -213,7 +215,7 @@ async function loadCart() {
       tableBody.appendChild(row);
     });
 
-    totalDiv.textContent = Total: ₹${total};
+    totalDiv.textContent = `Total: ₹${total}`;
   }
 
 async function clearCart() {
@@ -225,8 +227,29 @@ async function clearCart() {
   loadCart();
 }
 
+async function updateQuantity(index, newQty) {
+  const res = await fetch(`${scriptURL}?email=${userEmail}`);
+  let cart = await res.json();
+
+  newQty = parseInt(newQty);
+  if (isNaN(newQty) || newQty < 1) {
+    alert("Quantity must be at least 1");
+    return;
+  }
+
+  cart[index].quantity = newQty;
+
+  await fetch(scriptURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: userEmail, cart })
+  });
+
+  loadCart(); // Refresh the cart display
+}
 
 async function removeItem(index) {
+  try{
   const res = await fetch(`${scriptURL}?email=${userEmail}`);
   let cart = await res.json();
 
@@ -252,6 +275,10 @@ async function removeItem(index) {
   let total = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
   sessionStorage.setItem("cartTotal", total);
   window.location.href = "payment.html";
+}
+  } catch (error) {
+  console.error("Failed to load cart:", error);
+  alert("Error loading cart. Please try again later.");
 }
   window.onload = loadCart;
 </script>
