@@ -314,11 +314,11 @@ function toggleGoogleForm() {
         setTimeout(() => window.location.href = "index.html", 4000);
       });
 
-    //   updateUIOnPaymentMethodChange();
-    // } catch (error) {
-    //   console.error("Error in payment page script:", error);
-    //   alert("Something went wrong loading payment details. Please refresh and try again.");
-    // }
+      updateUIOnPaymentMethodChange();
+    } catch (error) {
+      console.error("Error in payment page script:", error);
+      alert("Something went wrong loading payment details. Please refresh and try again.");
+    }
       
 }
   </script>
