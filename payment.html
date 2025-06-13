@@ -178,7 +178,7 @@
       let deliveryCharge = updateAmounts();
 
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-      if (user.name) document.getElementById("name").value = user.name;
+     // if (user.name) document.getElementById("name").value = user.name;
       if (user.phone) document.getElementById("phone").value = user.phone;
       if (user.email) document.getElementById("email").value = user.email;
       if (user.address) document.getElementById("address").value = user.address;
@@ -229,71 +229,98 @@
         });
       });
 
-      function toggleGoogleForm() {
-        const name = document.getElementById("name").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const address = document.getElementById("address").value.trim();
-        const pincode = document.getElementById("pincode").value.trim();
-        const cartDetails = cart.map(item => `${item.name} x${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`).join("\n");
-        const totalFormatted = total.toFixed(2);
-        const paymentMethod = paymentMethodSelect.value;
+      // function toggleGoogleForm() {
+      //   const name = document.getElementById("name").value.trim();
+      //   const phone = document.getElementById("phone").value.trim();
+      //   const email = document.getElementById("email").value.trim();
+      //   const address = document.getElementById("address").value.trim();
+      //   const pincode = document.getElementById("pincode").value.trim();
+      //   const cartDetails = cart.map(item => `${item.name} x${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`).join("\n");
+      //   const totalFormatted = total.toFixed(2);
+      //   const paymentMethod = paymentMethodSelect.value;
 
-        let formURL = "";
-        if (paymentMethod === "UPI (Paytm / Google Pay / Phone Pay)") {
-          formURL = `https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url&entry.552548492=${encodeURIComponent(name)}&entry.257981681=${encodeURIComponent(phone)}&entry.1920841676=${encodeURIComponent(email)}&entry.340525268=${encodeURIComponent(address)}&entry.1264909969=${encodeURIComponent(pincode)}&entry.216020480=${encodeURIComponent(cartDetails)}&entry.1584322114=${encodeURIComponent(totalFormatted)}&entry.1131349200=${encodeURIComponent(paymentMethod)}`;
-        } else {
-          formURL = `https://docs.google.com/forms/d/e/1FAIpQLScB9r5MtB3HBNKa6kzOCZWz2sf4X0ZN1Gik0HefGCyQvgvSvw/viewform?usp=pp_url&entry.727221695=${encodeURIComponent(name)}&entry.587011233=${encodeURIComponent(phone)}&entry.671837471=${encodeURIComponent(email)}&entry.1798396967=${encodeURIComponent(address)}&entry.916509460=${encodeURIComponent(pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(paymentMethod)}`;
-        }
+        // let formURL = "";
+        // if (paymentMethod === "UPI (Paytm / Google Pay / Phone Pay)") {
+        //   formURL = `https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url&entry.552548492=${encodeURIComponent(name)}&entry.257981681=${encodeURIComponent(phone)}&entry.1920841676=${encodeURIComponent(email)}&entry.340525268=${encodeURIComponent(address)}&entry.1264909969=${encodeURIComponent(pincode)}&entry.216020480=${encodeURIComponent(cartDetails)}&entry.1584322114=${encodeURIComponent(totalFormatted)}&entry.1131349200=${encodeURIComponent(paymentMethod)}`;
+        // } else {
+        //   formURL = `https://docs.google.com/forms/d/e/1FAIpQLScB9r5MtB3HBNKa6kzOCZWz2sf4X0ZN1Gik0HefGCyQvgvSvw/viewform?usp=pp_url&entry.727221695=${encodeURIComponent(name)}&entry.587011233=${encodeURIComponent(phone)}&entry.671837471=${encodeURIComponent(email)}&entry.1798396967=${encodeURIComponent(address)}&entry.916509460=${encodeURIComponent(pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(paymentMethod)}`;
+        // }
 
-        iframe.src = formURL;
-        formContainer.classList.toggle("hidden");
+        // iframe.src = formURL;
+        // formContainer.classList.toggle("hidden");
 
-        // Simulate form filled after 5 seconds (or set via message listener)
-        setTimeout(() => {
-          googleFormFilled = true;
-          submitBtn.disabled = !validateForm();
-        }, 5000);
-      }
+        // // Simulate form filled after 5 seconds (or set via message listener)
+        // setTimeout(() => {
+      //     googleFormFilled = true;
+      //     submitBtn.disabled = !validateForm();
+      //   }, 5000);
+      // }
 
-      submitBtn.addEventListener("click", () => {
-        if (!validateForm()) {
-          alert("Please complete the form and include valid details.");
-          return;
-        }
+      // submitBtn.addEventListener("click", () => {
+      //   if (!validateForm()) {
+      //     alert("Please complete the form and include valid details.");
+      //     return;
+      //   }
 
-        const order = {
-          date: new Date().toISOString(),
-          items: cart,
-          subtotal: total.toFixed(2),
-          deliveryCharge: deliveryCharge.toFixed(2),
-          total: (total + deliveryCharge).toFixed(2),
-          customer: {
-            name: document.getElementById("name").value.trim(),
-            phone: document.getElementById("phone").value.trim(),
-            email: document.getElementById("email").value.trim(),
-            address: document.getElementById("address").value.trim(),
-            pincode: document.getElementById("pincode").value.trim()
-          },
-          paymentMethod: paymentMethodSelect.value
-        };
+      //   const order = {
+      //     date: new Date().toISOString(),
+      //     items: cart,
+      //     subtotal: total.toFixed(2),
+      //     deliveryCharge: deliveryCharge.toFixed(2),
+      //     total: (total + deliveryCharge).toFixed(2),
+      //     customer: {
+        //     name: document.getElementById("name").value.trim(),
+        //     phone: document.getElementById("phone").value.trim(),
+        //     email: document.getElementById("email").value.trim(),
+        //     address: document.getElementById("address").value.trim(),
+        //     pincode: document.getElementById("pincode").value.trim()
+        //   },
+        //   paymentMethod: paymentMethodSelect.value
+        // };
 
-        const allOrders = JSON.parse(localStorage.getItem("userOrders") || "{}");
-        const userOrders = allOrders[order.customer.email] || [];
-        userOrders.push(order);
-        allOrders[order.customer.email] = userOrders;
-        localStorage.setItem("userOrders", JSON.stringify(allOrders));
-        localStorage.removeItem("cart");
+        // const allOrders = JSON.parse(localStorage.getItem("userOrders") || "{}");
+        // const userOrders = allOrders[order.customer.email] || [];
+        // userOrders.push(order);
+        // allOrders[order.customer.email] = userOrders;
+    //     localStorage.setItem("userOrders", JSON.stringify(allOrders));
+    //     localStorage.removeItem("cart");
 
-        document.body.innerHTML = `<div style="font-family: Arial, sans-serif; text-align: center; padding: 100px 20px;"><h1 style="color: green; font-size: 2.5rem;">✅ Your order is confirmed!</h1><p style="font-size: 1.2rem;">Thank you for shopping with us. Redirecting to home...</p></div>`;
-        setTimeout(() => window.location.href = "index.html", 4000);
-      });
+    //     document.body.innerHTML = `<div style="font-family: Arial, sans-serif; text-align: center; padding: 100px 20px;"><h1 style="color: green; font-size: 2.5rem;">✅ Your order is confirmed!</h1><p style="font-size: 1.2rem;">Thank you for shopping with us. Redirecting to home...</p></div>`;
+    //     setTimeout(() => window.location.href = "index.html", 4000);
+    //   });
 
-      updateUIOnPaymentMethodChange();
-    } catch (error) {
-      console.error("Error in payment page script:", error);
-      alert("Something went wrong loading payment details. Please refresh and try again.");
-    }
+    //   updateUIOnPaymentMethodChange();
+    // } catch (error) {
+    //   console.error("Error in payment page script:", error);
+    //   alert("Something went wrong loading payment details. Please refresh and try again.");
+    // }
+      
+function toggleGoogleForm() {
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const address = document.getElementById("address").value.trim();
+  const pincode = document.getElementById("pincode").value.trim();
+  const cartDetails = cart.map(item => `${item.name} x${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`).join("\n");
+  const totalFormatted = total.toFixed(2);
+  const paymentMethod = paymentMethodSelect.value;
+
+  let formURL = "";
+  if (paymentMethod === "UPI (Paytm / Google Pay / Phone Pay)") {
+    formURL = `https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url&entry.552548492=${encodeURIComponent(name)}&entry.257981681=${encodeURIComponent(phone)}&entry.1920841676=${encodeURIComponent(email)}&entry.340525268=${encodeURIComponent(address)}&entry.1264909969=${encodeURIComponent(pincode)}&entry.216020480=${encodeURIComponent(cartDetails)}&entry.1584322114=${encodeURIComponent(totalFormatted)}&entry.1131349200=${encodeURIComponent(paymentMethod)}`;
+  } else {
+    formURL = `https://docs.google.com/forms/d/e/1FAIpQLScB9r5MtB3HBNKa6kzOCZWz2sf4X0ZN1Gik0HefGCyQvgvSvw/viewform?usp=pp_url&entry.727221695=${encodeURIComponent(name)}&entry.587011233=${encodeURIComponent(phone)}&entry.671837471=${encodeURIComponent(email)}&entry.1798396967=${encodeURIComponent(address)}&entry.916509460=${encodeURIComponent(pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(paymentMethod)}`;
+  }
+
+  // Open Google Form in a new tab/window
+  window.open(formURL, '_blank');
+
+  // Simulate user filling form (you can improve this with real callback later)
+  setTimeout(() => {
+    googleFormFilled = true;
+    submitBtn.disabled = !validateForm();
+  }, 5000);
+}
   </script>
 
 </body>
