@@ -55,12 +55,6 @@
       display: block;
       margin: 0 auto;
     }
-    iframe {
-      width: 100%;
-      height: 600px;
-      border: none;
-      margin-top: 1rem;
-    }
     @media (max-width: 600px) {
       body { padding: 1rem; }
       .address-pincode-container { flex-direction: column; }
@@ -120,10 +114,7 @@
   </div>
 
   <div class="section hidden" id="google-form-section">
-    <button type="button" id="google-form-btn" onclick="toggleGoogleForm()">📝 Fill Google Form with Your Info</button>
-    <div id="form-container" class="hidden">
-      <iframe id="embedded-form" src=""></iframe>
-    </div>
+    <button type="button" id="google-form-btn" onclick="openPrefilledGoogleForm()">📝 Fill Google Form with Your Info</button>
   </div>
 
   <div class="section">
@@ -141,8 +132,6 @@
       const submitBtn = document.getElementById("submit-btn");
       const qrCodeSection = document.getElementById("qr-code-section");
       const googleFormSection = document.getElementById("google-form-section");
-      const formContainer = document.getElementById("form-container");
-      const iframe = document.getElementById("embedded-form");
 
       let total = 0;
       let googleFormFilled = false;
@@ -178,7 +167,7 @@
       let deliveryCharge = updateAmounts();
 
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-     if (user.name) document.getElementById("name").value = user.name;
+      if (user.name) document.getElementById("name").value = user.name;
       if (user.phone) document.getElementById("phone").value = user.phone;
       if (user.email) document.getElementById("email").value = user.email;
       if (user.address) document.getElementById("address").value = user.address;
@@ -203,19 +192,16 @@
       function updateUIOnPaymentMethodChange() {
         const paymentMethod = paymentMethodSelect.value;
         if (paymentMethod === "Cash on Delivery") {
-          googleFormSection.classList.remove("hidden");
+          googleFormSection.classList.add("hidden");
           qrCodeSection.classList.add("hidden");
-          formContainer.classList.add("hidden");
-          googleFormFilled = false;
+          googleFormFilled = true;
         } else if (paymentMethod === "UPI (Paytm / Google Pay / Phone Pay)") {
           googleFormSection.classList.remove("hidden");
           qrCodeSection.classList.remove("hidden");
-          formContainer.classList.add("hidden");
           googleFormFilled = false;
         } else {
           googleFormSection.classList.add("hidden");
           qrCodeSection.classList.add("hidden");
-          formContainer.classList.add("hidden");
           googleFormFilled = false;
         }
         submitBtn.disabled = !validateForm();
@@ -229,64 +215,34 @@
         });
       });
 
-      // function toggleGoogleForm() {
-      //   const name = document.getElementById("name").value.trim();
-      //   const phone = document.getElementById("phone").value.trim();
-      //   const email = document.getElementById("email").value.trim();
-      //   const address = document.getElementById("address").value.trim();
-      //   const pincode = document.getElementById("pincode").value.trim();
-      //   const cartDetails = cart.map(item => `${item.name} x${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`).join("\n");
-      //   const totalFormatted = total.toFixed(2);
-      //   const paymentMethod = paymentMethodSelect.value;
+      function openPrefilledGoogleForm() {
+        const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const address = document.getElementById("address").value.trim();
+        const pincode = document.getElementById("pincode").value.trim();
+        let cartDetails = "";
+        cart.forEach(item => {
+          const product = item.name || "Unnamed";
+          const quantity = item.quantity || 1;
+          const price = item.price || 0;
+          const imageUrl = item.image || "";
+          const imageLink = imageUrl ? ` [Image](${imageUrl})` : "";
+          cartDetails += `${product} x${quantity} = ₹${(price * quantity).toFixed(2)}${imageLink}\n`;
+        });
+        const totalFormatted = total.toFixed(2);
+        const baseURL = "https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url";
+        const fullURL = `${baseURL}&entry.552548492=${encodeURIComponent(name)}&entry.257981681=${encodeURIComponent(phone)}&entry.1920841676=${encodeURIComponent(email)}&entry.340525268=${encodeURIComponent(address)}&entry.1264909969=${encodeURIComponent(pincode)}&entry.216020480=${encodeURIComponent(cartDetails)}&entry.1584322114=${encodeURIComponent(totalFormatted)}&entry.1131349200=${encodeURIComponent(paymentMethodSelect.value)}`;
+        window.open(fullURL, "_blank");
+        googleFormFilled = true;
+        submitBtn.disabled = !validateForm();
+      }
 
-        // let formURL = "";
-        // if (paymentMethod === "UPI (Paytm / Google Pay / Phone Pay)") {
-        //   formURL = `https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url&entry.552548492=${encodeURIComponent(name)}&entry.257981681=${encodeURIComponent(phone)}&entry.1920841676=${encodeURIComponent(email)}&entry.340525268=${encodeURIComponent(address)}&entry.1264909969=${encodeURIComponent(pincode)}&entry.216020480=${encodeURIComponent(cartDetails)}&entry.1584322114=${encodeURIComponent(totalFormatted)}&entry.1131349200=${encodeURIComponent(paymentMethod)}`;
-        // } else {
-        //   formURL = `https://docs.google.com/forms/d/e/1FAIpQLScB9r5MtB3HBNKa6kzOCZWz2sf4X0ZN1Gik0HefGCyQvgvSvw/viewform?usp=pp_url&entry.727221695=${encodeURIComponent(name)}&entry.587011233=${encodeURIComponent(phone)}&entry.671837471=${encodeURIComponent(email)}&entry.1798396967=${encodeURIComponent(address)}&entry.916509460=${encodeURIComponent(pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(paymentMethod)}`;
-        // }
-
-        // iframe.src = formURL;
-        // formContainer.classList.toggle("hidden");
-
-        // // Simulate form filled after 5 seconds (or set via message listener)
-        // setTimeout(() => {
-      //     googleFormFilled = true;
-      //     submitBtn.disabled = !validateForm();
-      //   }, 5000);
-      // }
-function toggleGoogleForm() {
-  const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const address = document.getElementById("address").value.trim();
-  const pincode = document.getElementById("pincode").value.trim();
-  const cartDetails = cart.map(item => `${item.name} x${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`).join("\n");
-  const totalFormatted = total.toFixed(2);
-  const paymentMethod = paymentMethodSelect.value;
-
-  let formURL = "";
-  if (paymentMethod === "UPI (Paytm / Google Pay / Phone Pay)") {
-    formURL = `https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url&entry.552548492=${encodeURIComponent(name)}&entry.257981681=${encodeURIComponent(phone)}&entry.1920841676=${encodeURIComponent(email)}&entry.340525268=${encodeURIComponent(address)}&entry.1264909969=${encodeURIComponent(pincode)}&entry.216020480=${encodeURIComponent(cartDetails)}&entry.1584322114=${encodeURIComponent(totalFormatted)}&entry.1131349200=${encodeURIComponent(paymentMethod)}`;
-  } else {
-    formURL = `https://docs.google.com/forms/d/e/1FAIpQLScB9r5MtB3HBNKa6kzOCZWz2sf4X0ZN1Gik0HefGCyQvgvSvw/viewform?usp=pp_url&entry.727221695=${encodeURIComponent(name)}&entry.587011233=${encodeURIComponent(phone)}&entry.671837471=${encodeURIComponent(email)}&entry.1798396967=${encodeURIComponent(address)}&entry.916509460=${encodeURIComponent(pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(paymentMethod)}`;
-  }
-
-  // Open Google Form in a new tab/window
-  window.open(formURL, '_blank');
-
-  // Simulate user filling form (you can improve this with real callback later)
-  setTimeout(() => {
-    googleFormFilled = true;
-    submitBtn.disabled = !validateForm();
-  }, 5000); // ✅ Now closed correctly
-}
       submitBtn.addEventListener("click", () => {
         if (!validateForm()) {
           alert("Please complete the form and include valid details.");
           return;
         }
-
         const order = {
           date: new Date().toISOString(),
           items: cart,
@@ -302,13 +258,18 @@ function toggleGoogleForm() {
           },
           paymentMethod: paymentMethodSelect.value
         };
-
         const allOrders = JSON.parse(localStorage.getItem("userOrders") || "{}");
         const userOrders = allOrders[order.customer.email] || [];
         userOrders.push(order);
         allOrders[order.customer.email] = userOrders;
         localStorage.setItem("userOrders", JSON.stringify(allOrders));
         localStorage.removeItem("cart");
+
+        if (order.paymentMethod === "Cash on Delivery") {
+          const codBase = "https://docs.google.com/forms/d/e/1FAIpQLScB9r5MtB3HBNKa6kzOCZWz2sf4X0ZN1Gik0HefGCyQvgvSvw/viewform?usp=pp_url";
+          const codURL = `${codBase}&entry.727221695=${encodeURIComponent(order.customer.name)}&entry.587011233=${encodeURIComponent(order.customer.phone)}&entry.671837471=${encodeURIComponent(order.customer.email)}&entry.1798396967=${encodeURIComponent(order.customer.address)}&entry.916509460=${encodeURIComponent(order.customer.pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(order.paymentMethod)}`;
+          window.open(codURL, "_blank");
+        }
 
         document.body.innerHTML = `<div style="font-family: Arial, sans-serif; text-align: center; padding: 100px 20px;"><h1 style="color: green; font-size: 2.5rem;">✅ Your order is confirmed!</h1><p style="font-size: 1.2rem;">Thank you for shopping with us. Redirecting to home...</p></div>`;
         setTimeout(() => window.location.href = "index.html", 4000);
@@ -319,8 +280,6 @@ function toggleGoogleForm() {
       console.error("Error in payment page script:", error);
       alert("Something went wrong loading payment details. Please refresh and try again.");
     }
-      
-}
   </script>
 
 </body>
