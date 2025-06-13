@@ -344,11 +344,11 @@ function showOrders() {
         const orderDiv = document.createElement("div");
         orderDiv.className = "order";
 
-        const date = new Date(order["Timestamp"]).toLocaleString();
-        const payment = order["Payment Method"] || "Unknown";
-        const items = order["Cart Details"] || "Unnamed Product";
-        const total = order["Total"] || "N/A";
-        const id = order["Order ID"] || `#${index + 1}`;
+      const payment = order["Payment Method"]?.toString() || "Unknown";
+const items = order["Cart Details"]?.toString() || "Unnamed Product";
+const total = order["Total"]?.toString() || "N/A";
+const dateRaw = order["Timestamp"];
+const date = dateRaw ? new Date(dateRaw).toLocaleString() : "Unknown";
 
         orderDiv.innerHTML = `
           <p><strong>Cart Details:</strong> ${items}</p>
