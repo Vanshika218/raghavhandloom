@@ -135,7 +135,7 @@
       }
     }
   </style>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!--   <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
 </head>
 <body>
 <header>
@@ -169,10 +169,85 @@
 <footer>
   &copy; 2025 Raghav Handloom. All rights reserved.
 </footer>
-
 <script>
+  const email = localStorage.getItem("email"); // Replace this with actual user email logic
+
+  async function fetchCart(email) {
+    const res = await fetch(`https://script.google.com/macros/s/AKfycbzNrPJD86CwmTf7XNoqnMiTlmKzywnR5Olg5HDBGPGSSrfO3AiheAeDnenuW4wv9oLO/exec?email=${email}`);
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  }
+
+  async function saveCart(email, cart) {
+    await fetch("https://script.google.com/macros/s/AKfycbzNrPJD86CwmTf7XNoqnMiTlmKzywnR5Olg5HDBGPGSSrfO3AiheAeDnenuW4wv9oLO/exec", {
+      method: "POST",
+      body: JSON.stringify({ email, cart }),
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
+  async function loadCart() {
+    const cart = await fetchCart(email);
+    const tableBody = document.querySelector('#cartTable tbody');
+    const totalDiv = document.getElementById('cartTotal');
+    tableBody.innerHTML = '';
+    let total = 0;
+
+    cart.forEach((item, index) => {
+      const itemTotal = item.price * (item.quantity || 1);
+      total += itemTotal;
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td data-label="Product">
+          <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover;"><br>${item.name}
+        </td>
+        <td data-label="Unit Price">₹${item.price}</td>
+        <td data-label="Quantity">${item.quantity || 1}</td>
+        <td data-label="Total">₹${itemTotal}</td>
+        <td data-label="Action">
+          <button onclick="removeItem(${index})">Delete</button>
+        </td>`;
+      tableBody.appendChild(row);
+    });
+
+    totalDiv.textContent = `Total: ₹${total}`;
+  }
+
+  async function removeItem(index) {
+    const cart = await fetchCart(email);
+    cart.splice(index, 1);
+    await saveCart(email, cart);
+    loadCart();
+  }
+
+  async function clearCart() {
+    await saveCart(email, []);
+    loadCart();
+  }
+
+  async function goToPayment() {
+    const cart = await fetchCart(email);
+    if (cart.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+    const total = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+    localStorage.setItem("cartTotal", total);
+    window.location.href = "payment.html";
+  }
+
+  window.onload = loadCart;
+</script>
+
+<!-- <script>
   function loadCart() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(async function fetchCartFromServer(userId) {
+  const res = await fetch(`https://script.google.com/macros/s/your-script-id/exec?userId=${userId}`);
+  const cart = await res.json();
+  return cart;
+}
+) || [];
     const tableBody = document.querySelector('#cartTable tbody');
     const totalDiv = document.getElementById('cartTotal');
     tableBody.innerHTML = '';
@@ -208,14 +283,34 @@
   }
 
   function removeItem(index) {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(async function fetchCartFromServer(userId) {
+  const res = await fetch(`https://script.google.com/macros/s/your-script-id/exec?userId=${userId}`);
+  const cart = await res.json();
+  return cart;
+}
+
+) || [];
     cart.splice(index, 1);
-    localStorage.setItem('cart', JSON.stringify(cart));
+    async function saveCartToServer(cart, userId) {
+  await fetch("https://script.google.com/macros/s/your-script-id/exec", {
+    method: "POST",
+    body: JSON.stringify({ userId, cart }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+;
     loadCart();
   }
 
   function goToPayment() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(async function fetchCartFromServer(userId) {
+  const res = await fetch(`https://script.google.com/macros/s/your-script-id/exec?userId=${userId}`);
+  const cart = await res.json();
+  return cart;
+}
+) || [];
     if (cart.length === 0) {
       alert("Your cart is empty!");
       return;
@@ -227,6 +322,6 @@
   }
 
   window.onload = loadCart;
-</script>
+</script> -->
 </body>
 </html>
