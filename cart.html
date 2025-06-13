@@ -171,7 +171,12 @@
 </footer>
 
 <script>
-  const userEmail = 'example@example.com'; // Replace this dynamically or hardcode it temporarily
+ // Replace this dynamically or hardcode it temporarily
+  const userEmail = localStorage.getItem("currentUser");
+  if (!userEmail) {
+  alert("Please login to continue.");
+  window.location.href = "signup.html"; // or "profile.html"
+}
   const scriptURL = "https://script.google.com/macros/s/AKfycbzNrPJD86CwmTf7XNoqnMiTlmKzywnR5Olg5HDBGPGSSrfO3AiheAeDnenuW4wv9oLO/exec";
 async function loadCart() {
   const res = await fetch(`${scriptURL}?email=${userEmail}`);
@@ -182,35 +187,6 @@ async function loadCart() {
   } catch {
     cart = [];
   }
-
-  const tableBody = document.querySelector('#cartTable tbody');
-  const totalDiv = document.getElementById('cartTotal');
-  tableBody.innerHTML = '';
-  let total = 0;
-
-  cart.forEach((item, index) => {
-    const itemTotal = item.price * (item.quantity || 1);
-    total += itemTotal;
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td data-label="Product">
-        <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"><br>
-        ${item.name}
-      </td>
-      <td data-label="Unit Price">₹${item.price}</td>
-      <td data-label="Quantity">${item.quantity || 1}</td>
-      <td data-label="Total">₹${itemTotal}</td>
-      <td data-label="Action">
-        <button onclick="removeItem(${index})" style="background-color:red; color:white; border:none; padding:5px 10px; border-radius:4px;">Delete</button>
-      </td>
-    `;
-    tableBody.appendChild(row);
-  });
-
-  totalDiv.textContent = `Total: ₹${total}`;
-}
-
     const tableBody = document.querySelector('#cartTable tbody');
     const totalDiv = document.getElementById('cartTotal');
     tableBody.innerHTML = '';
