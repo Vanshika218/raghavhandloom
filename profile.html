@@ -191,7 +191,7 @@
   user = cachedUser;
   displayUserProfile(user);
     } else {
-      const scriptURL = `https://script.google.com/macros/s/AKfycbxGLq1sQbnsTtqSQFk--4tFq2AsrBqko9gwTNwEZIdwd-CVCMeq6nn7MHkHlBfCg3fCYA/exec?action=getUser&email=${encodeURIComponent(email)}&signupKey=${encodeURIComponent(password)}`;
+      const scriptURL = `https://script.google.com/macros/s/AKfycbwIngG2NC201Bl7Nhbpw33SwJJB4gbi7mM_0UaBlCaEInp8SzrZp1R_QkCMQUoYnVgoRw/exec?action=getUser&email=${encodeURIComponent(email)}&signupKey=${encodeURIComponent(password)}`;
 
       fetch(scriptURL)
         .then(response => response.json())
@@ -324,7 +324,7 @@ function showOrders() {
     return;
   }
 
-  const url = `https://script.google.com/macros/s/AKfycbxGLq1sQbnsTtqSQFk--4tFq2AsrBqko9gwTNwEZIdwd-CVCMeq6nn7MHkHlBfCg3fCYA/exec?mode=getOrders&email=${encodeURIComponent(user.email)}`;
+  const url = `https://script.google.com/macros/s/AKfycbwIngG2NC201Bl7Nhbpw33SwJJB4gbi7mM_0UaBlCaEInp8SzrZp1R_QkCMQUoYnVgoRw/exec?mode=getOrders&email=${encodeURIComponent(user.email)}`;
 
   ordersContainer.innerHTML = `<p>Loading orders...</p>`;
 
@@ -343,18 +343,19 @@ function showOrders() {
       allOrders.forEach((order, index) => {
         const orderDiv = document.createElement("div");
         orderDiv.className = "order";
-
-      const payment = order["Payment Method"]?.toString() || "Unknown";
-const items = order["Cart Details"]?.toString() || "Unnamed Product";
-const total = order["Total"]?.toString() || "N/A";
+      const screenshot = order[" Screenshot Upload "]?.toString() || "Unknown";
+      const payment = order[" Payment Method "]?.toString() || "Unknown";
+const items = order[" Cart Details "]?.toString() || "Unnamed Product";
+const total = order[" Total "]?.toString() || "N/A";
 const dateRaw = order["Timestamp"];
 const date = dateRaw ? new Date(dateRaw).toLocaleString() : "Unknown";
 
         orderDiv.innerHTML = `
-          <p><strong>Cart Details:</strong> ${items}</p>
-          <p><strong>Payment Method:</strong> ${payment}</p>
+          <p><strong> Cart Details :</strong> ${items}</p>
+          <p><strong> Payment Method :</strong> ${payment}</p>
+          <p><strong> Screenshot Upload :</strong> ${screenshot}</p>
           <p><strong>Date:</strong> ${date}</p>
-          <p><strong>Total:</strong> ₹${total}</p>
+          <p><strong> Total :</strong> ₹${total}</p>
         `;
 
         ordersContainer.appendChild(orderDiv);
@@ -395,7 +396,7 @@ function saveProfileChanges() {
     return;
   }
 
-  const updateUrl = `https://script.google.com/macros/s/AKfycbxGLq1sQbnsTtqSQFk--4tFq2AsrBqko9gwTNwEZIdwd-CVCMeq6nn7MHkHlBfCg3fCYA/exec?mode=updateProfile&email=${encodeURIComponent(email)}&name=${encodeURIComponent(newName)}&phone=${encodeURIComponent(newPhone)}&signupKey=${encodeURIComponent(newPassword)}&address=${encodeURIComponent(newAddress)}&pincode=${encodeURIComponent(newPincode)}`;
+  const updateUrl = `https://script.google.com/macros/s/AKfycbwIngG2NC201Bl7Nhbpw33SwJJB4gbi7mM_0UaBlCaEInp8SzrZp1R_QkCMQUoYnVgoRw/exec?mode=updateProfile&email=${encodeURIComponent(email)}&name=${encodeURIComponent(newName)}&phone=${encodeURIComponent(newPhone)}&signupKey=${encodeURIComponent(newPassword)}&address=${encodeURIComponent(newAddress)}&pincode=${encodeURIComponent(newPincode)}`;
 
   fetch(updateUrl)
     .then(res => res.json())
