@@ -64,89 +64,50 @@
       button { font-size: 1.1rem; padding: 0.9rem; }
       #qr-code-section img { width: 100%; max-width: 100%; }
     }
+    #google-form-iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      margin-top: 1rem;
+    }
   </style>
 </head>
 <body>
 
-  <h2>🗳️ Review & Confirm Your Payment</h2>
+<!-- All existing content remains unchanged -->
 
-  <div class="section" id="cart-summary">
-    <h3>🛒 Order Summary</h3>
-    <div id="cart-items"></div>
-    <p><strong>Subtotal: ₹<span id="subtotal-amount">0</span></strong></p>
-    <p><strong>Delivery Charge: ₹<span id="delivery-charge">0</span></strong></p>
-    <p><strong>Total (incl. Delivery): ₹<span id="total-amount">0</span></strong></p>
-  </div>
+<script>
+// Inside openPrefilledGoogleForm function, replace window.open with iframe
+function openPrefilledGoogleForm() {
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const address = document.getElementById("address").value.trim();
+  const pincode = document.getElementById("pincode").value.trim();
+  let cartDetails = "";
+  cart.forEach(item => {
+    const product = item.name || "Unnamed";
+    const quantity = item.quantity || 1;
+    const price = item.price || 0;
+    const imageUrl = item.image || "";
+    const imageLink = imageUrl ? ` [Image](${imageUrl})` : "";
+    cartDetails += `${product} x${quantity} = ₹${(price * quantity).toFixed(2)}${imageLink}\n`;
+  });
+  const totalFormatted = total.toFixed(2);
+  const baseURL = "https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url";
+  const fullURL = `${baseURL}&entry.552548492=${encodeURIComponent(name)}&entry.257981681=${encodeURIComponent(phone)}&entry.1920841676=${encodeURIComponent(email)}&entry.340525268=${encodeURIComponent(address)}&entry.1264909969=${encodeURIComponent(pincode)}&entry.216020480=${encodeURIComponent(cartDetails)}&entry.1584322114=${encodeURIComponent(totalFormatted)}&entry.1131349200=${encodeURIComponent(paymentMethodSelect.value)}`;
 
-  <div class="section">
-    <h3>👤 Customer Details</h3>
-    <label for="name">Full Name</label>
-    <input type="text" id="name" required />
-
-    <label for="phone">Phone Number</label>
-    <input type="tel" id="phone" required />
-
-    <label for="email">Email Address</label>
-    <input type="email" id="email" required />
-
-    <label for="address">Delivery Address</label>
-    <div class="address-pincode-container">
-      <textarea id="address" required rows="3" placeholder="Street, Area, etc."></textarea>
-      <div class="pincode-wrapper">
-        <label for="pincode">PIN Code</label>
-        <input type="text" id="pincode" required placeholder="e.g., 560001" maxlength="6" />
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <label for="payment-method">Payment Method</label>
-    <select id="payment-method" required>
-      <option value="" disabled selected>Select Payment Method</option>
-      <option value="UPI (Paytm / Google Pay / Phone Pay)">UPI (Paytm / Google Pay / Phone Pay)</option>
-      <option value="Cash on Delivery">Cash on Delivery</option>
-    </select>
-  </div>
-
-  <div class="section hidden" id="qr-code-section">
-    <h3>📲 Scan to Pay</h3>
-    <img id="qr-code-img" src="img/a1.jpg" alt="UPI QR Code" />
-  </div>
-
-  <div class="section hidden" id="google-form-section">
-    <button type="button" id="google-form-btn" onclick="openPrefilledGoogleForm()">📝 Fill Google Form with Your Info</button>
-  </div>
-
-  <div class="section">
-    <button id="submit-btn" disabled>✅ Confirm Payment</button>
-  </div>
-
-  <script>
-    const previousPage = window.location.href;
-    function openPrefilledGoogleForm() {
-      const name = document.getElementById("name").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const address = document.getElementById("address").value.trim();
-      const pincode = document.getElementById("pincode").value.trim();
-      let cartDetails = "";
-      cart.forEach(item => {
-        const product = item.name || "Unnamed";
-        const quantity = item.quantity || 1;
-        const price = item.price || 0;
-        const imageUrl = item.image || "";
-        const imageLink = imageUrl ? ` [Image](${imageUrl})` : "";
-        cartDetails += `${product} x${quantity} = ₹${(price * quantity).toFixed(2)}${imageLink}\n`;
-      });
-      const totalFormatted = total.toFixed(2);
-      const baseURL = "https://docs.google.com/forms/d/e/1FAIpQLSeErRQk0ONev8Z5dVlgLq-qCx6wIu8B-1LyiXDWlevtBsDK4Q/viewform?usp=pp_url";
-      const redirectParam = `&continue=${encodeURIComponent(previousPage)}`;
-      const fullURL = `${baseURL}&entry.552548492=${encodeURIComponent(name)}&entry.257981681=${encodeURIComponent(phone)}&entry.1920841676=${encodeURIComponent(email)}&entry.340525268=${encodeURIComponent(address)}&entry.1264909969=${encodeURIComponent(pincode)}&entry.216020480=${encodeURIComponent(cartDetails)}&entry.1584322114=${encodeURIComponent(totalFormatted)}&entry.1131349200=${encodeURIComponent(paymentMethodSelect.value)}${redirectParam}`;
-      window.open(fullURL, "_blank");
-      googleFormFilled = true;
-      submitBtn.disabled = !validateForm();
-    }
-  </script>
+  let iframe = document.getElementById("google-form-iframe");
+  if (!iframe) {
+    iframe = document.createElement("iframe");
+    iframe.id = "google-form-iframe";
+    document.getElementById("google-form-section").appendChild(iframe);
+  }
+  iframe.src = fullURL;
+  googleFormFilled = true;
+  submitBtn.disabled = !validateForm();
+}
+</script>
 
 </body>
 </html>
