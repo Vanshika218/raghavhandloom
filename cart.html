@@ -140,7 +140,7 @@ async function syncCartFromServer() {
   if (!user) return;
   const email = encodeURIComponent(user.email);
 
-  const res = await fetch(`${`https://script.google.com/macros/s/AKfycbxJBZ859NJIRoQ2SN_WL4cp08J9zk2Yu2lafiHa9T5OM6i4WTqpSFtlQ-Dy-Jabr2AN/exec`}?email=${email}`);
+  const res = await fetch(`${`https://script.google.com/macros/s/AKfycbwbo9LuwcRLPUWIJ5EwapcdkqHzmm5TpDaSP_196eDJp5nupDeoxARQbCWwb5NGOCsp/exec`}?email=${email}`);
   const cartItems = await res.json();
 
   // Optional: clear localStorage cart and use server data:
