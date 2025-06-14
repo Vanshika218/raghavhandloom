@@ -157,12 +157,38 @@ window.onload = async () => {
     loadCart();
   }
 
-  function removeItem(index) {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    cart.splice(index, 1);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    loadCart();
+  async function removeItem(index) {
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  const item = cart[index];
+
+  // Remove from local cart
+  cart.splice(index, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  loadCart();
+
+  // Also delete from Google Sheet using fetch
+  if (item && item.email && item.name && item.image) {
+    await fetch("https://script.google.com/macros/s/AKfycbxoty6SKzRIBwqCdhgczT764R1uuNZZ12mwEHbFKIKhHTN0PyxPVcCM7eEzhSwbxspu/exec", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "delete",
+        email: item.email,
+        name: item.name,
+        image: item.image
+      }),
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        console.log("Item deleted from Google Sheet");
+      } else {
+        console.warn("Failed to delete from sheet:", res.message);
+      }
+    })
+    .catch(err => console.error("Error deleting from sheet:", err));
   }
+}
+
 
   function goToPayment() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
