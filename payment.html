@@ -271,12 +271,34 @@
         localStorage.setItem("userOrders", JSON.stringify(allOrders));
         localStorage.removeItem("cart");
 
-        if (order.paymentMethod === "Cash on Delivery") {
+        // if (order.paymentMethod === "Cash on Delivery") {
+        //   const codBase = "https://docs.google.com/forms/d/e/1FAIpQLScB9r5MtB3HBNKa6kzOCZWz2sf4X0ZN1Gik0HefGCyQvgvSvw/viewform?usp=pp_url";
+        //   const codURL = `${codBase}&entry.727221695=${encodeURIComponent(order.customer.name)}&entry.587011233=${encodeURIComponent(order.customer.phone)}&entry.671837471=${encodeURIComponent(order.customer.email)}&entry.1798396967=${encodeURIComponent(order.customer.address)}&entry.916509460=${encodeURIComponent(order.customer.pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(order.paymentMethod)}`;
+        //   window.open(codURL, "_blank");
+        // }
+// Clear cart from Google Sheet via Apps Script
+fetch("https://script.google.com/macros/s/AKfycbwZYcf_2sH5UPcBJlYUWMdDv8RfgLlQwd8AlXiSB4NXYqa_HN42Sr-CrmZpB3XbgOob/exec", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    action: "clearCart",
+    email: order.customer.email,
+  }),
+})
+.then(res => res.json())
+.then(res => {
+  console.log("Cart cleared:", res);
+})
+.catch(err => {
+  console.error("Failed to clear cart:", err);
+});
+  if (order.paymentMethod === "Cash on Delivery") {
           const codBase = "https://docs.google.com/forms/d/e/1FAIpQLScB9r5MtB3HBNKa6kzOCZWz2sf4X0ZN1Gik0HefGCyQvgvSvw/viewform?usp=pp_url";
           const codURL = `${codBase}&entry.727221695=${encodeURIComponent(order.customer.name)}&entry.587011233=${encodeURIComponent(order.customer.phone)}&entry.671837471=${encodeURIComponent(order.customer.email)}&entry.1798396967=${encodeURIComponent(order.customer.address)}&entry.916509460=${encodeURIComponent(order.customer.pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(order.paymentMethod)}`;
           window.open(codURL, "_blank");
         }
-
         document.body.innerHTML = `<div style="font-family: Arial, sans-serif; text-align: center; padding: 100px 20px;"><h1 style="color: green; font-size: 2.5rem;">✅ Your order is confirmed!</h1><p style="font-size: 1.2rem;">Thank you for shopping with us. Redirecting to home...</p></div>`;
         setTimeout(() => window.location.href = "index.html", 4000);
       });
