@@ -264,7 +264,7 @@ function addToCart(btn, name, price) {
     alert("Please login first from Profile page.");
     return;
   }
-
+const cartItem = { email: userEmail, name, image: img, price, quantity: qty, total };
   // Step 2: Add to localStorage
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
   const alreadyInCart = cart.find(item => item.name === name && item.image === img);
@@ -274,21 +274,14 @@ function addToCart(btn, name, price) {
     return;
   }
 
-  cart.push({ email,name,image: image, price, quantity: quantity,total });
+  cart.push(cartItem);
   localStorage.setItem('cart', JSON.stringify(cart));
 
   // Step 3: Send to Google Sheet
   fetch("https://script.google.com/macros/s/AKfycbx9Efy4MhQdG117fq4twPz-2C6OfLMMYoepqpUQMh9H1Zc0I3PX32Mf13GAm9yCNXlE/exec", {
     method: "POST",
-    body: JSON.stringify({
-      email: user.email,
-      name: product.name,
-      image: product.image,
-      price:product.price,
-      quantity: product.quantity,
-      total: product.price * product.quantity
+   body: JSON.stringify(cartItem)
     })
-  })
   .then(res => res.json())
   .then(res => {
     if (res.success) {
