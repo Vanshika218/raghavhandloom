@@ -274,18 +274,19 @@ function addToCart(btn, name, price) {
     return;
   }
 
-  cart.push({ name, price, quantity: qty, image: img });
+  cart.push({ email,name,image: image, price, quantity: quantity,total });
   localStorage.setItem('cart', JSON.stringify(cart));
 
   // Step 3: Send to Google Sheet
-  fetch("https://script.google.com/macros/s/AKfycbwbo9LuwcRLPUWIJ5EwapcdkqHzmm5TpDaSP_196eDJp5nupDeoxARQbCWwb5NGOCsp/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbx9Efy4MhQdG117fq4twPz-2C6OfLMMYoepqpUQMh9H1Zc0I3PX32Mf13GAm9yCNXlE/exec", {
     method: "POST",
     body: JSON.stringify({
       email: user.email,
-      product: name,
-      price,
-      quantity: qty,
-      total
+      name: product.name,
+      image: product.image,
+      price:product.price,
+      quantity: product.quantity,
+      total: product.price * product.quantity
     })
   })
   .then(res => res.json())
