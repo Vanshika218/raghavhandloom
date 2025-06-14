@@ -124,7 +124,9 @@
           ${item.name}
         </td>
         <td>₹${item.price}</td>
-        <td>${item.quantity || 1}</td>
+              <td>
+        <input type="number" min="1" value="${item.quantity || 1}" onchange="updateQuantity(${index}, this.value)">
+      </td>
         <td>₹${itemTotal}</td>
         <td>
           <button onclick="removeItem(${index})" style="background-color:red; color:white; border:none; padding:5px 10px; border-radius:4px;">Delete</button>
@@ -135,6 +137,30 @@
 
     totalDiv.textContent = `Total: ₹${total}`;
   }
+  function updateQuantity(index, newQty) {
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  newQty = parseInt(newQty);
+  if (newQty < 1) newQty = 1;
+
+  cart[index].quantity = newQty;
+  cart[index].total = newQty * cart[index].price;
+  localStorage.setItem('cart', JSON.stringify(cart));
+  loadCart();
+
+  // Sync to Google Sheet
+  const item = cart[index];
+  fetch("https://script.google.com/macros/s/AKfycbx9Efy4MhQdG117fq4twPz-2C6OfLMMYoepqpUQMh9H1Zc0I3PX32Mf13GAm9yCNXlE/exec", {
+    method: "POST",
+    body: JSON.stringify({
+      action: "update",
+      email: item.email,
+      name: item.name,
+      image: item.image,
+      quantity: item.quantity,
+      total: item.total
+    }),
+  });
+}
 async function syncCartFromServer() {
   const user = JSON.parse(localStorage.getItem('user'));
   if (!user) return;
