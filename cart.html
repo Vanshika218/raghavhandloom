@@ -247,19 +247,16 @@ window.onload = async () => {
 
   // window.onload = loadCart;
 window.onload = async () => {
-  document.body.style.overflow = 'hidden'; // disable scrolling
   const spinner = document.getElementById('spinner');
+  spinner.style.display = 'flex';          // Show spinner
+  document.body.style.overflow = 'hidden'; // Disable scrolling
 
-  setTimeout(async () => {
-    spinner.style.display = 'none';
-    document.body.style.overflow = ''; // re-enable scrolling
-    await syncCartFromServer();
-    loadCart();
-  }, 3000);
+  await syncCartFromServer(); // This fetches the data
+  loadCart();                 // This renders the table rows
+
+  spinner.style.display = 'none';          // Hide spinner
+  document.body.style.overflow = '';       // Enable scrolling
 };
-
-
-
 </script>
 </body>
 </html>
