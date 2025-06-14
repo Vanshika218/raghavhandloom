@@ -290,6 +290,9 @@ const cartItem = { email: userEmail, name, image: img, price, quantity: qty, tot
       btn.style.background = "#28a745";
       alert(`${name} added to cart & synced.`);
     } else {
+       let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart = cart.filter(item => !(item.name === name && item.image === img));
+    localStorage.setItem('cart', JSON.stringify(cart));
       alert(res.message || "Already in cart.");
     }
   })
