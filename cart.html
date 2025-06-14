@@ -11,7 +11,7 @@
       margin: 0;
       padding: 0;
     }
-    .loader {
+.loader {
   border: 8px solid #f3f3f3;
   border-top: 8px solid #333;
   border-radius: 50%;
@@ -82,10 +82,10 @@
       margin-top: 2rem;
     }
   </style>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!--   <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
 </head>
 <body>
-  <div id="spinner" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; justify-content: center; align-items: center; z-index: 9999;">
+<div id="spinner" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; justify-content: center; align-items: center; z-index: 9999;">
   <div class="loader"></div>
 </div>
 <header>
@@ -247,17 +247,17 @@ window.onload = async () => {
 
   // window.onload = loadCart;
 window.onload = async () => {
-  document.body.style.overflow = 'hidden'; // prevent scroll during loading
+  document.body.style.overflow = 'hidden'; // disable scrolling
   const spinner = document.getElementById('spinner');
 
-  // Delay for 3 seconds
   setTimeout(async () => {
     spinner.style.display = 'none';
-    document.body.style.overflow = ''; // restore scroll
+    document.body.style.overflow = ''; // re-enable scrolling
     await syncCartFromServer();
     loadCart();
   }, 3000);
 };
+
 
 
 </script>
