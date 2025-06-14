@@ -259,6 +259,7 @@ function addToCart(btn, name, price) {
 
   // Step 1: Get user email
   const user = JSON.parse(localStorage.getItem('user'));
+  const userEmail = user?.email;
   if (!user || !user.email) {
     alert("Please login first from Profile page.");
     return;
