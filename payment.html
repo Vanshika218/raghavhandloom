@@ -277,15 +277,15 @@
         //   window.open(codURL, "_blank");
         // }
 // Clear cart from Google Sheet via Apps Script
-fetch("https://script.google.com/macros/s/AKfycbypFIUNMncCHLsozGbk84FGOTOnQPux-vn20IZdFWXXZIrAAk6iEKxUFe0e7itjQIU/exec", {
+fetch("https://script.google.com/macros/s/AKfycbwVGQStFtbIAh3-cpemBdkv1GNynAnRUs3PqGcj5HM2EH_vY-Pfqp5WDmVP6udFiuwS/exec", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
     action: "clearCart",
-    // email: order.customer.email,
-    email: "vinitaagarwal218@gmail.com",
+    email: order.customer.email,
+    // email: "vinitaagarwal218@gmail.com",
   }),
 })
 .then(res => res.json())
