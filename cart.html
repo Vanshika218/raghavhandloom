@@ -135,6 +135,22 @@
 
     totalDiv.textContent = `Total: ₹${total}`;
   }
+async function syncCartFromServer() {
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user) return;
+  const email = encodeURIComponent(user.email);
+
+  const res = await fetch(`${`https://script.google.com/macros/s/AKfycbxJBZ859NJIRoQ2SN_WL4cp08J9zk2Yu2lafiHa9T5OM6i4WTqpSFtlQ-Dy-Jabr2AN/exec`}?email=${email}`);
+  const cartItems = await res.json();
+
+  // Optional: clear localStorage cart and use server data:
+  localStorage.setItem('cart', JSON.stringify(cartItems));
+  loadCart(); // re-render
+}
+window.onload = () => {
+  syncCartFromServer();
+  // then existing loadCart() chain if needed
+};
 
   function clearCart() {
     localStorage.removeItem('cart');
