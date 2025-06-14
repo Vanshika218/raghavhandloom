@@ -147,9 +147,9 @@ async function syncCartFromServer() {
   localStorage.setItem('cart', JSON.stringify(cartItems));
   loadCart(); // re-render
 }
-window.onload = () => {
-  syncCartFromServer();
-  // then existing loadCart() chain if needed
+window.onload = async () => {
+  await syncCartFromServer();
+  loadCart();
 };
 
   function clearCart() {
