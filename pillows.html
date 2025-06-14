@@ -234,24 +234,40 @@
   }
 
   function addToCart(btn, name, price) {
-    const card = btn.closest('.product-card');
-    const qty = parseInt(card.querySelector('.quantity-input').value) || 1;
-    const img = card.querySelector('.slide.active').src;
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const alreadyInCart = cart.find(item => item.name === name && item.image === img);
+  //   const card = btn.closest('.product-card');
+  //   const qty = parseInt(card.querySelector('.quantity-input').value) || 1;
+  //   const img = card.querySelector('.slide.active').src;
+  //   let cart = JSON.parse(localStorage.getItem('cart')) || [];
+  //   const alreadyInCart = cart.find(item => item.name === name && item.image === img);
 
-    if (!alreadyInCart) {
-      cart.push({ name, price, quantity: qty, image: img });
-      localStorage.setItem('cart', JSON.stringify(cart));
-      btn.textContent = '✔ Added';
-      btn.disabled = true;
-      btn.style.background = '#28a745';
-      btn.style.color = '#fff';
-      alert(`${name} (x${qty}) added to cart!`);
-    } else {
-      alert(`${name} with this design is already in the cart.`);
-    }
-  }
+  //   if (!alreadyInCart) {
+  //     cart.push({ name, price, quantity: qty, image: img });
+  //     localStorage.setItem('cart', JSON.stringify(cart));
+  //     btn.textContent = '✔ Added';
+  //     btn.disabled = true;
+  //     btn.style.background = '#28a745';
+  //     btn.style.color = '#fff';
+  //     alert(`${name} (x${qty}) added to cart!`);
+  //   } else {
+  //     alert(`${name} with this design is already in the cart.`);
+  //   }
+  // }
+    fetch(`https://script.google.com/macros/s/AKfycbxJBZ859NJIRoQ2SN_WL4cp08J9zk2Yu2lafiHa9T5OM6i4WTqpSFtlQ-Dy-Jabr2AN/exec`, {
+    method: 'POST',
+    body: JSON.stringify({
+      email: JSON.parse(localStorage.getItem('user')).email,
+      product: name,
+      price,
+      quantity: qty,
+      total: price * qty,
+    })
+  })
+  .then(res => res.json())
+  .then(r => {
+    if (r.success) alert(`${name} added to cart & synced!`);
+  })
+  .catch(console.error);
+}
 
   function renderProducts(products) {
     const cat = document.getElementById('catalog');
