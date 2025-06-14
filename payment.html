@@ -284,7 +284,8 @@ fetch("https://script.google.com/macros/s/AKfycbypFIUNMncCHLsozGbk84FGOTOnQPux-v
   },
   body: JSON.stringify({
     action: "clearCart",
-    email: order.customer.email,
+    // email: order.customer.email,
+    email: "vinitaagarwal218@gmail.com",
   }),
 })
 .then(res => res.json())
