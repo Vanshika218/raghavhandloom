@@ -140,7 +140,7 @@ async function syncCartFromServer() {
   if (!user) return;
   const email = encodeURIComponent(user.email);
 
-  const res = await fetch(`${`https://script.google.com/macros/s/AKfycbwbo9LuwcRLPUWIJ5EwapcdkqHzmm5TpDaSP_196eDJp5nupDeoxARQbCWwb5NGOCsp/exec`}?email=${email}`);
+  const res = await fetch(`${`https://script.google.com/macros/s/AKfycbzqVraM4uoIorHA4bhSqNp_MndLM4G_oF_4GKoBV92cAfZ2EBjPxHOAUMD2S71GgAFt/exec`}?email=${email}`);
   const cartItems = await res.json();
 
   // Optional: clear localStorage cart and use server data:
@@ -176,7 +176,12 @@ window.onload = async () => {
     window.location.href = "payment.html";
   }
 
-  window.onload = loadCart;
+  // window.onload = loadCart;
+  window.onload = async () => {
+  await syncCartFromServer();
+  loadCart();
+};
+
 </script>
 </body>
 </html>
