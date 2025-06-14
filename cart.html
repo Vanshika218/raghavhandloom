@@ -149,7 +149,7 @@
 
   // Sync to Google Sheet
   const item = cart[index];
-  fetch("https://script.google.com/macros/s/AKfycbz68BLibw0FB4DCwnXUY-H_qeUJVJ1K3DbBKwTV1xcjM4pZxtTePiZPBeOnn5_h7kzO/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbwPhVVcOfvCoFnRw23vHogS23d6Hgcyxw6YXMSrCVB1VaG7xm990_zpEXpUO16CSBD9/exec", {
     method: "POST",
     body: JSON.stringify({
       action: "update",
@@ -167,7 +167,7 @@ async function syncCartFromServer() {
   if (!user) return;
   const email = encodeURIComponent(user.email);
 
-  const res = await fetch(`${`https://script.google.com/macros/s/AKfycbx9Efy4MhQdG117fq4twPz-2C6OfLMMYoepqpUQMh9H1Zc0I3PX32Mf13GAm9yCNXlE/exec`}?email=${email}`);
+  const res = await fetch(`${`https://script.google.com/macros/s/AKfycbwPhVVcOfvCoFnRw23vHogS23d6Hgcyxw6YXMSrCVB1VaG7xm990_zpEXpUO16CSBD9/exec`}?email=${email}`);
   const cartItems = await res.json();
 
   // Optional: clear localStorage cart and use server data:
@@ -195,7 +195,7 @@ window.onload = async () => {
 
   // Also delete from Google Sheet using fetch
   if (item && item.email && item.name && item.image) {
-    await fetch("https://script.google.com/macros/s/AKfycbxoty6SKzRIBwqCdhgczT764R1uuNZZ12mwEHbFKIKhHTN0PyxPVcCM7eEzhSwbxspu/exec", {
+    await fetch("https://script.google.com/macros/s/AKfycbwPhVVcOfvCoFnRw23vHogS23d6Hgcyxw6YXMSrCVB1VaG7xm990_zpEXpUO16CSBD9/exec", {
       method: "POST",
       body: JSON.stringify({
         action: "delete",
