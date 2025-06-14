@@ -278,7 +278,7 @@ function addToCart(btn, name, price) {
   localStorage.setItem('cart', JSON.stringify(cart));
 
   // Step 3: Send to Google Sheet
-  fetch("https://script.google.com/macros/s/AKfycbzhEdTyvc5zWtoqtQahS2BmuftZIjqu_w31urepj6QbeQCuS3qT_dLBuiLuFgZ9b8Ec/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbwbo9LuwcRLPUWIJ5EwapcdkqHzmm5TpDaSP_196eDJp5nupDeoxARQbCWwb5NGOCsp/exec", {
     method: "POST",
     body: JSON.stringify({
       email: user.email,
