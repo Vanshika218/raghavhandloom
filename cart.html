@@ -11,19 +11,18 @@
       margin: 0;
       padding: 0;
     }
-.loader {
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #333;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #333;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
     header {
       background-color: #333;
       color: #fff;
@@ -31,6 +30,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
     }
     .shop-name {
       font-family: 'Cursive', sans-serif;
@@ -81,13 +81,53 @@
       color: #fff;
       margin-top: 2rem;
     }
+
+    /* Responsive styling */
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead {
+        display: none;
+      }
+      tr {
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        padding: 0.5rem;
+        border-radius: 5px;
+        background: #fff;
+      }
+      td {
+        text-align: right;
+        position: relative;
+        padding-left: 50%;
+        border: none;
+        border-bottom: 1px solid #eee;
+      }
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 12px;
+        width: 45%;
+        padding-right: 10px;
+        font-weight: bold;
+        white-space: nowrap;
+        text-align: left;
+      }
+      .total {
+        text-align: center;
+      }
+      .clear-btn {
+        width: 100%;
+      }
+    }
   </style>
-<!--   <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
 </head>
 <body>
 <div id="spinner" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; justify-content: center; align-items: center; z-index: 9999;">
   <div class="loader"></div>
 </div>
+
 <header>
   <div class="shop-name">Raghav Handloom</div>
   <nav>
@@ -126,25 +166,23 @@
     const tableBody = document.querySelector('#cartTable tbody');
     const totalDiv = document.getElementById('cartTotal');
     tableBody.innerHTML = '';
-
     let total = 0;
 
     cart.forEach((item, index) => {
       const itemTotal = item.price * (item.quantity || 1);
       total += itemTotal;
-
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>
+        <td data-label="Product">
           <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"><br>
           ${item.name}
         </td>
-        <td>₹${item.price}</td>
-              <td>
-        <input type="number" min="1" value="${item.quantity || 1}" onchange="updateQuantity(${index}, this.value)">
-      </td>
-        <td>₹${itemTotal}</td>
-        <td>
+        <td data-label="Unit Price">₹${item.price}</td>
+        <td data-label="Quantity">
+          <input type="number" min="1" value="${item.quantity || 1}" onchange="updateQuantity(${index}, this.value)">
+        </td>
+        <td data-label="Total">₹${itemTotal}</td>
+        <td data-label="Action">
           <button onclick="removeItem(${index})" style="background-color:red; color:white; border:none; padding:5px 10px; border-radius:4px;">Delete</button>
         </td>
       `;
@@ -153,47 +191,40 @@
 
     totalDiv.textContent = `Total: ₹${total}`;
   }
+
   function updateQuantity(index, newQty) {
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  newQty = parseInt(newQty);
-  if (newQty < 1) newQty = 1;
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    newQty = parseInt(newQty);
+    if (newQty < 1) newQty = 1;
+    cart[index].quantity = newQty;
+    cart[index].total = newQty * cart[index].price;
+    localStorage.setItem('cart', JSON.stringify(cart));
+    loadCart();
 
-  cart[index].quantity = newQty;
-  cart[index].total = newQty * cart[index].price;
-  localStorage.setItem('cart', JSON.stringify(cart));
-  loadCart();
+    const item = cart[index];
+    fetch("https://script.google.com/macros/s/AKfycbwLBm5i2tTWFWLxg39PQ-DDQv3Cf_re4V2VH4XG5ts1LJmPb-ZE11zOMvmN3vOwjapB/exec", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "update",
+        email: item.email,
+        name: item.name,
+        image: item.image,
+        price: item.price,
+        quantity: item.quantity,
+        total: item.total
+      }),
+    });
+  }
 
-  // Sync to Google Sheet
-  const item = cart[index];
-  fetch("https://script.google.com/macros/s/AKfycbwLBm5i2tTWFWLxg39PQ-DDQv3Cf_re4V2VH4XG5ts1LJmPb-ZE11zOMvmN3vOwjapB/exec", {
-    method: "POST",
-    body: JSON.stringify({
-      action: "update",
-      email: item.email,
-      name: item.name,
-      image: item.image,
-      price: item.price,
-      quantity: item.quantity,
-      total: item.total
-    }),
-  });
-}
-async function syncCartFromServer() {
-  const user = JSON.parse(localStorage.getItem('user'));
-  if (!user) return;
-  const email = encodeURIComponent(user.email);
-
-  const res = await fetch(`${`https://script.google.com/macros/s/AKfycbwPhVVcOfvCoFnRw23vHogS23d6Hgcyxw6YXMSrCVB1VaG7xm990_zpEXpUO16CSBD9/exec`}?email=${email}`);
-  const cartItems = await res.json();
-
-  // Optional: clear localStorage cart and use server data:
-  localStorage.setItem('cart', JSON.stringify(cartItems));
-  loadCart(); // re-render
-}
-window.onload = async () => {
-  await syncCartFromServer();
-  loadCart();
-};
+  async function syncCartFromServer() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) return;
+    const email = encodeURIComponent(user.email);
+    const res = await fetch(`https://script.google.com/macros/s/AKfycbwPhVVcOfvCoFnRw23vHogS23d6Hgcyxw6YXMSrCVB1VaG7xm990_zpEXpUO16CSBD9/exec?email=${email}`);
+    const cartItems = await res.json();
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    loadCart();
+  }
 
   function clearCart() {
     localStorage.removeItem('cart');
@@ -201,37 +232,24 @@ window.onload = async () => {
   }
 
   async function removeItem(index) {
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const item = cart[index];
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const item = cart[index];
+    cart.splice(index, 1);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    loadCart();
 
-  // Remove from local cart
-  cart.splice(index, 1);
-  localStorage.setItem('cart', JSON.stringify(cart));
-  loadCart();
-
-  // Also delete from Google Sheet using fetch
-  if (item && item.email && item.name && item.image) {
-    await fetch("https://script.google.com/macros/s/AKfycbwPhVVcOfvCoFnRw23vHogS23d6Hgcyxw6YXMSrCVB1VaG7xm990_zpEXpUO16CSBD9/exec", {
-      method: "POST",
-      body: JSON.stringify({
-        action: "delete",
-        email: item.email,
-        name: item.name,
-        image: item.image
-      }),
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        console.log("Item deleted from Google Sheet");
-      } else {
-        console.warn("Failed to delete from sheet:", res.message);
-      }
-    })
-    .catch(err => console.error("Error deleting from sheet:", err));
+    if (item && item.email && item.name && item.image) {
+      await fetch("https://script.google.com/macros/s/AKfycbwPhVVcOfvCoFnRw23vHogS23d6Hgcyxw6YXMSrCVB1VaG7xm990_zpEXpUO16CSBD9/exec", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "delete",
+          email: item.email,
+          name: item.name,
+          image: item.image
+        }),
+      });
+    }
   }
-}
-
 
   function goToPayment() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -239,24 +257,20 @@ window.onload = async () => {
       alert("Your cart is empty!");
       return;
     }
-
     let total = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
     localStorage.setItem("cartTotal", total);
     window.location.href = "payment.html";
   }
 
-  // window.onload = loadCart;
-window.onload = async () => {
-  const spinner = document.getElementById('spinner');
-  spinner.style.display = 'flex';          // Show spinner
-  document.body.style.overflow = 'hidden'; // Disable scrolling
-
-  await syncCartFromServer(); // This fetches the data
-  loadCart();                 // This renders the table rows
-
-  spinner.style.display = 'none';          // Hide spinner
-  document.body.style.overflow = '';       // Enable scrolling
-};
+  window.onload = async () => {
+    const spinner = document.getElementById('spinner');
+    spinner.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    await syncCartFromServer();
+    loadCart();
+    spinner.style.display = 'none';
+    document.body.style.overflow = '';
+  };
 </script>
 </body>
 </html>
