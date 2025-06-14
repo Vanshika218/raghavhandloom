@@ -265,23 +265,73 @@
     });
   }
 
-  function addToCart(btn, name, price) {
-    const card = btn.closest('.product-card');
-    const qty = parseInt(card.querySelector('.quantity-input').value) || 1;
-    const img = card.querySelector('.slide.active').src;
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    if (!cart.find(x => x.name === name)) {
-      cart.push({ name, price, quantity: qty, image: img });
-      localStorage.setItem('cart', JSON.stringify(cart));
-      btn.textContent = '✔ Added';
-      btn.disabled = true;
-      btn.style.background = '#28a745';
-      btn.style.color = '#fff';
-      alert(`${name} (x${qty}) added to cart!`);
-    } else {
-      alert(`${name} is already in the cart.`);
-    }
+  // function addToCart(btn, name, price) {
+  //   const card = btn.closest('.product-card');
+  //   const qty = parseInt(card.querySelector('.quantity-input').value) || 1;
+  //   const img = card.querySelector('.slide.active').src;
+  //   let cart = JSON.parse(localStorage.getItem('cart')) || [];
+  //   if (!cart.find(x => x.name === name)) {
+  //     cart.push({ name, price, quantity: qty, image: img });
+  //     localStorage.setItem('cart', JSON.stringify(cart));
+  //     btn.textContent = '✔ Added';
+  //     btn.disabled = true;
+  //     btn.style.background = '#28a745';
+  //     btn.style.color = '#fff';
+  //     alert(`${name} (x${qty}) added to cart!`);
+  //   } else {
+  //     alert(`${name} is already in the cart.`);
+  //   }
+  // }
+function addToCart(btn, name, price) {
+  const card = btn.closest('.product-card');
+  const qty = parseInt(card.querySelector('.quantity-input').value) || 1;
+  const img = card.querySelector('.slide.active')?.src || "";
+  const total = price * qty;
+
+  // Step 1: Get user email
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userEmail = user?.email;
+  if (!user || !user.email) {
+    alert("Please login first from Profile page.");
+    return;
   }
+const cartItem = { email: userEmail, name, image: img, price, quantity: qty, total };
+  // Step 2: Add to localStorage
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+  const alreadyInCart = cart.find(item => item.name === name && item.image === img);
+
+  if (alreadyInCart) {
+    alert(`${name} is already in your cart.`);
+    return;
+  }
+
+  cart.push(cartItem);
+  localStorage.setItem('cart', JSON.stringify(cart));
+
+  // Step 3: Send to Google Sheet
+  fetch("https://script.google.com/macros/s/AKfycbx9Efy4MhQdG117fq4twPz-2C6OfLMMYoepqpUQMh9H1Zc0I3PX32Mf13GAm9yCNXlE/exec", {
+    method: "POST",
+   body: JSON.stringify(cartItem)
+    })
+  .then(res => res.json())
+  .then(res => {
+    if (res.success) {
+      btn.textContent = "✔ Added";
+      btn.disabled = true;
+      btn.style.background = "#28a745";
+      alert(`${name} added to cart & synced.`);
+    } else {
+       let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart = cart.filter(item => !(item.name === name && item.image === img));
+    localStorage.setItem('cart', JSON.stringify(cart));
+      alert(res.message || "Already in cart.");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Error syncing with server.");
+  });
+}
 
   function cleanImageUrl(url) {
     if (!url) return '';
