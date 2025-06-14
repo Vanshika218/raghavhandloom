@@ -11,6 +11,23 @@
       margin: 0;
       padding: 0;
     }
+    .spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #ffffff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
     header {
       background: #2c3e50;
       color: #ecf0f1;
@@ -273,7 +290,9 @@ const cartItem = { email: userEmail, name, image: img, price, quantity: qty, tot
     alert(`${name} is already in your cart.`);
     return;
   }
-
+ const originalText = btn.innerHTML;
+  btn.innerHTML = 'Adding... <span class="spinner"></span>';
+  btn.disabled = true;
   cart.push(cartItem);
   localStorage.setItem('cart', JSON.stringify(cart));
 
@@ -293,11 +312,15 @@ const cartItem = { email: userEmail, name, image: img, price, quantity: qty, tot
        let cart = JSON.parse(localStorage.getItem('cart')) || [];
     cart = cart.filter(item => !(item.name === name && item.image === img));
     localStorage.setItem('cart', JSON.stringify(cart));
+       btn.innerHTML = originalText;
+        btn.disabled = false;
       alert(res.message || "Already in cart.");
     }
   })
   .catch(err => {
     console.error(err);
+     btn.innerHTML = originalText;
+      btn.disabled = false;
     alert("Error syncing with server.");
   });
 }
