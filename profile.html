@@ -126,11 +126,12 @@
 </div>
     <div class="profile-info" id="profileData">Loading profile...</div>
 
-    <div class="action-buttons" id="profileButtons" style="display: none;">
-      <button onclick="toggleOrders()">🧾 Your Orders</button>
-      <button onclick="toggleEditProfile()">✏️ Edit Profile</button>
-      <button onclick="logout()">🔓 Logout</button>
-    </div>
+<div class="action-buttons" id="profileButtons" style="display: none;">
+  <button onclick="toggleOrders()">🧾 Your Orders</button>
+  <button onclick="toggleOrderStatus()">📦 Track Status</button>
+  <button onclick="toggleEditProfile()">✏️ Edit Profile</button>
+  <button onclick="logout()">🔓 Logout</button>
+</div>
 
     <div class="action-buttons" id="loginButtons" style="display: none;">
       <button id="loginRedirect" onclick="goToSignup()">🔐 Login / Sign Up</button>
@@ -140,6 +141,10 @@
       <h3>Your Orders</h3>
       <div id="ordersContainer"></div>
     </div>
+    <div id="statusSection" style="display: none;">
+  <h3>Order Status</h3>
+  <div id="statusContainer"></div>
+</div>
 
     <div class="review-section" id="reviewSection" style="display: none;">
       <h3>Leave a Review</h3>
@@ -221,6 +226,51 @@
           profileDiv.innerHTML = "<p>Error loading profile. Please try again.</p>";
         });
     }
+function toggleOrderStatus() {
+  const section = document.getElementById("statusSection");
+  if (section.style.display === "none") {
+    section.style.display = "block";
+    loadOrderStatus();
+  } else {
+    section.style.display = "none";
+  }
+}
+
+function loadOrderStatus() {
+  const container = document.getElementById("statusContainer");
+  container.innerHTML = "Loading status...";
+
+  const url = `https://script.google.com/macros/s/AKfycbyym5AFCMYoJMsKkmNTUDBHt4WjCFKEsPy7fpeBBkho4zIPhQkQ9LrbEHxo8pAufMRQ0A/exec?mode=getOrders&email=${encodeURIComponent(user.email)}`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      const allOrders = [...(data.upiOrders || []), ...(data.codOrders || [])];
+      if (allOrders.length === 0) {
+        container.innerHTML = `<p class="empty-msg">No orders to track.</p>`;
+        return;
+      }
+
+      let html = "";
+      allOrders.forEach((order, i) => {
+        const status = order["Status"] || "Status not available";
+        const date = order["Timestamp"] ? new Date(order["Timestamp"]).toLocaleString() : "Unknown";
+        html += `
+          <div class="order" style="margin-bottom:1rem;">
+            <p><strong>Order #${i + 1}</strong></p>
+            <p><strong>Date:</strong> ${date}</p>
+            <p><strong>Status:</strong> ${status}</p>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    })
+    .catch(err => {
+      console.error("Failed to fetch status:", err);
+      container.innerHTML = `<p class="empty-msg">Error loading order status.</p>`;
+    });
+}
 
     function logout() {
       localStorage.removeItem("currentUser");
