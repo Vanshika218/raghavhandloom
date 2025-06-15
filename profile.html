@@ -420,12 +420,20 @@ try {
 const total = order["  Total  "]?.toString() || "N/A";
 const dateRaw = order["Timestamp"];
 const date = dateRaw ? new Date(dateRaw).toLocaleString() : "Unknown";
-        orderDiv.innerHTML = `
-          <p><strong> Cart Details :</strong> ${items}</p>
-          <p><strong> Payment Method :</strong> ${payment}</p>
-          <p><strong>Date:</strong> ${date}</p>
-          <p><strong> Total :</strong> ₹${total}</p>
-        `;
+        const status = order["Status"] || "Not updated";
+        // orderDiv.innerHTML = `
+        //   <p><strong> Cart Details :</strong> ${items}</p>
+        //   <p><strong> Payment Method :</strong> ${payment}</p>
+        //   <p><strong>Date:</strong> ${date}</p>
+        //   <p><strong> Total :</strong> ₹${total}</p>
+        // `;
+orderDiv.innerHTML = `
+  <p><strong>Cart Details:</strong> ${items}</p>
+  <p><strong>Payment Method:</strong> ${payment}</p>
+  <p><strong>Date:</strong> ${date}</p>
+  <p><strong>Total:</strong> ₹${total}</p>
+  <p><strong>Status:</strong> <span style="color: ${getStatusColor(status)};">${status}</span></p>
+`;
 
         ordersContainer.appendChild(orderDiv);
       });
@@ -434,6 +442,17 @@ const date = dateRaw ? new Date(dateRaw).toLocaleString() : "Unknown";
       console.error("Failed to fetch orders:", err);
       ordersContainer.innerHTML = `<p class="empty-msg">Error loading orders.</p>`;
     });
+}
+function getStatusColor(status) {
+  if (!status) return "gray";
+
+  const s = status.toLowerCase();
+  if (s.includes("delivered")) return "green";
+  if (s.includes("out for delivery") || s.includes("on the way")) return "blue";
+  if (s.includes("cancelled")) return "red";
+  if (s.includes("processing")) return "orange";
+
+  return "black"; // default color
 }
 
     function toggleEditProfile() {
