@@ -276,25 +276,14 @@
         //   const codURL = `${codBase}&entry.727221695=${encodeURIComponent(order.customer.name)}&entry.587011233=${encodeURIComponent(order.customer.phone)}&entry.671837471=${encodeURIComponent(order.customer.email)}&entry.1798396967=${encodeURIComponent(order.customer.address)}&entry.916509460=${encodeURIComponent(order.customer.pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(order.paymentMethod)}`;
         //   window.open(codURL, "_blank");
         // }
-// Clear cart from Google Sheet via Apps Script
-fetch("https://script.google.com/macros/s/AKfycbw0zXA_Nb9izUyfju0487cxfIYqj9-lEDoSsA1y_s8lJRVhbshw8mdUu7xdqTUO8AiP/exec", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    action: "clearCart",
-    email: order.customer.email,
-    // email: "vinitaagarwal218@gmail.com",
-  }),
-})
-.then(res => res.json())
-.then(res => {
-  console.log("Cart cleared:", res);
-})
-.catch(err => {
-  console.error("Failed to clear cart:", err);
-});
+fetch(`https://script.google.com/macros/s/AKfycbz4faWpzY4-vyVXKGQvwZzk_dmF65-oG3IMH5bY4g2IqCAlDdU3znSZEdWRhcaVS6-q/exec?action=clearCart&email=${encodeURIComponent(order.customer.email)}`)
+  .then(res => res.json())
+  .then(res => {
+    console.log("Cart cleared:", res);
+  })
+  .catch(err => {
+    console.error("Failed to clear cart:", err);
+  });
   if (order.paymentMethod === "Cash on Delivery") {
           const codBase = "https://docs.google.com/forms/d/e/1FAIpQLScB9r5MtB3HBNKa6kzOCZWz2sf4X0ZN1Gik0HefGCyQvgvSvw/viewform?usp=pp_url";
           const codURL = `${codBase}&entry.727221695=${encodeURIComponent(order.customer.name)}&entry.587011233=${encodeURIComponent(order.customer.phone)}&entry.671837471=${encodeURIComponent(order.customer.email)}&entry.1798396967=${encodeURIComponent(order.customer.address)}&entry.916509460=${encodeURIComponent(order.customer.pincode)}&entry.879563908=${encodeURIComponent(JSON.stringify(cart))}&entry.1466223965=${encodeURIComponent((total + deliveryCharge).toFixed(2))}&entry.1312601765=${encodeURIComponent(order.paymentMethod)}`;
